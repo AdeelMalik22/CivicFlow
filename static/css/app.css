@@ -644,6 +644,288 @@ h3 {
   padding-top: 0.5rem;
 }
 
+/* Workspace entity forms */
+
+.form-breadcrumb {
+  margin-bottom: 1.25rem;
+}
+
+.form-breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.form-breadcrumb a:hover {
+  color: var(--brand);
+}
+
+.form-page-header {
+  align-items: center;
+  margin-bottom: 1.75rem;
+}
+
+.form-page-header h1 {
+  font-size: clamp(2rem, 3.5vw, 2.7rem);
+}
+
+.form-mode-badge {
+  padding: 0.42rem 0.75rem;
+  color: #174a91;
+  border: 1px solid #bdd2f2;
+  border-radius: 999px;
+  background: #edf4ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.entity-form {
+  gap: 1.5rem;
+}
+
+.entity-form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 19rem;
+  align-items: start;
+  gap: 1.4rem;
+}
+
+.form-section-stack,
+.form-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.form-card {
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: white;
+  box-shadow: 0 1px 3px rgba(15, 35, 64, 0.04);
+}
+
+.form-card-heading {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr);
+  gap: 0.9rem;
+  margin-bottom: 1.7rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.form-step {
+  display: grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  place-items: center;
+  color: var(--brand);
+  border-radius: 0.55rem;
+  background: var(--brand-pale);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.form-card-heading h2,
+.form-guidance h2 {
+  margin-bottom: 0.3rem;
+  font-size: 1.08rem;
+  letter-spacing: -0.01em;
+}
+
+.form-card-heading p,
+.form-guidance p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+}
+
+.form-grid-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid-span {
+  grid-column: 1 / -1;
+}
+
+.form-grid .form-field {
+  margin: 0;
+}
+
+.form-field .label-row > span {
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.3rem;
+  background: #f0f3f7;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.form-field input:not([type="checkbox"]),
+.form-field select,
+.form-field textarea {
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.form-field input:not([type="checkbox"]):focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px rgba(0, 111, 214, 0.13);
+  outline: 0;
+}
+
+.form-field.has-error input,
+.form-field.has-error select,
+.form-field.has-error textarea {
+  border-color: var(--danger);
+}
+
+.checkbox-control {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: #f8fafc;
+}
+
+.checkbox-control input {
+  position: absolute;
+  opacity: 0;
+}
+
+.checkbox-visual {
+  display: grid;
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  place-items: center;
+  border: 1px solid #8fa0b5;
+  border-radius: 0.3rem;
+  background: white;
+}
+
+.checkbox-control input:checked + .checkbox-visual {
+  border-color: var(--brand);
+  background: var(--brand);
+}
+
+.checkbox-control input:checked + .checkbox-visual::after {
+  color: white;
+  content: "✓";
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.checkbox-control input:focus-visible + .checkbox-visual {
+  box-shadow: 0 0 0 3px rgba(0, 111, 214, 0.18);
+}
+
+.checkbox-control label {
+  margin: 0;
+}
+
+.checkbox-control .field-help {
+  margin-bottom: 0;
+}
+
+.form-guidance {
+  position: sticky;
+  top: 1.25rem;
+  padding: 1.4rem;
+  border: 1px solid #cddbf0;
+  border-radius: 0.9rem;
+  background: #f4f8ff;
+}
+
+.guidance-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 1rem;
+  place-items: center;
+  color: white;
+  border-radius: 50%;
+  background: var(--brand);
+  font-family: Georgia, serif;
+  font-weight: 800;
+}
+
+.form-guidance ul {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1.15rem 0 0;
+  padding: 1.1rem 0 0 1.15rem;
+  color: #334a67;
+  border-top: 1px solid #d5e1f3;
+  font-size: 0.8rem;
+}
+
+.form-action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -8px 28px rgba(15, 35, 64, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.form-action-bar p,
+.form-action-bar strong,
+.form-action-bar span {
+  display: block;
+  margin: 0;
+}
+
+.form-action-bar strong {
+  font-size: 0.86rem;
+}
+
+.form-action-bar span {
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+}
+
+.form-action-bar > div {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.form-wide-alert {
+  margin: 0;
+}
+
+.form-card-map .dj_map,
+.form-card-map .olMap,
+.form-card-map [id$="_map"] {
+  width: 100% !important;
+  max-width: 100%;
+  border-radius: 0.7rem;
+}
+
+.form-card-map .dj_map {
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
 .form-field-map .dj_map_wrapper {
   width: 100%;
 }
@@ -1617,6 +1899,14 @@ h3 {
     width: min(calc(100% - 2rem), 85rem);
   }
 
+  .entity-form-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-guidance {
+    position: static;
+  }
+
   .hero-copy {
     max-width: 45rem;
   }
@@ -1703,6 +1993,28 @@ h3 {
   .directory-summary > div + div {
     border-top: 1px solid var(--line);
     border-left: 0;
+  }
+
+  .form-grid-two {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid-span {
+    grid-column: auto;
+  }
+
+  .form-action-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form-action-bar > div,
+  .form-action-bar .button {
+    width: 100%;
+  }
+
+  .form-action-bar .button {
+    justify-content: center;
   }
 }
 

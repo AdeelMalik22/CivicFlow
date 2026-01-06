@@ -1,58 +1,118 @@
 {% extends "workspace/base.html" %}
 
 {% block title %}{{ form_title }} — CivicFlow{% endblock %}
-
-{% block extra_head %}
-  {{ form.media.css }}
-{% endblock %}
+{% block extra_head %}{{ form.media.css }}{% endblock %}
 
 {% block workspace_content %}
-  <div class="page-header page-header-form">
+  <nav class="form-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url cancel_url_name %}">
+      <span aria-hidden="true">←</span>
+      {% if form_variant == "organization" %}Organizations{% elif form_variant == "service-area" %}Service areas{% else %}Memberships{% endif %}
+    </a>
+  </nav>
+
+  <div class="page-header form-page-header">
     <div>
       <p class="eyebrow">{{ eyebrow }}</p>
       <h1>{{ form_title }}</h1>
       <p>{{ form_intro }}</p>
     </div>
+    <span class="form-mode-badge">{% if object %}Editing record{% else %}New record{% endif %}</span>
   </div>
 
-  <section class="data-panel entity-form-panel">
-    <form method="post" class="entity-form" novalidate>
-      {% csrf_token %}
-      {% if form.non_field_errors %}
-        <div class="form-errors" role="alert">
-          {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-        </div>
-      {% endif %}
-
-      {% for field in form %}
-        <div class="form-field{% if field.field.widget.input_type == 'checkbox' %} form-field-checkbox{% endif %}{% if field.name == 'boundary' %} form-field-map{% endif %}">
-          {% if field.field.widget.input_type == "checkbox" %}
-            {{ field }}
-            {{ field.label_tag }}
-          {% else %}
-            <div class="label-row">
-              {{ field.label_tag }}
-              {% if field.field.required %}<span>Required</span>{% else %}<span>Optional</span>{% endif %}
-            </div>
-            {{ field }}
-          {% endif %}
-          {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
-          {% if field.errors %}
-            <div class="field-errors" role="alert">
-              {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
-            </div>
-          {% endif %}
-        </div>
-      {% endfor %}
-
-      <div class="form-actions">
-        <button class="button button-primary" type="submit">{{ submit_label }}</button>
-        <a class="button button-secondary" href="{% url cancel_url_name %}">Cancel</a>
+  <form method="post" class="entity-form" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="form-errors form-wide-alert" role="alert">
+        <strong>We couldn’t save this record</strong>
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
       </div>
-    </form>
-  </section>
+    {% endif %}
+
+    <div class="entity-form-layout">
+      <div class="form-section-stack">
+        {% if form_variant == "organization" %}
+          <section class="form-card" aria-labelledby="identity-heading">
+            <div class="form-card-heading">
+              <span class="form-step">01</span>
+              <div><h2 id="identity-heading">Organization identity</h2><p>The name and stable reference used throughout CivicFlow.</p></div>
+            </div>
+            <div class="form-grid form-grid-two">
+              {% include "tenants/includes/form_field.html" with field=form.name %}
+              {% include "tenants/includes/form_field.html" with field=form.slug %}
+            </div>
+          </section>
+          <section class="form-card" aria-labelledby="defaults-heading">
+            <div class="form-card-heading">
+              <span class="form-step">02</span>
+              <div><h2 id="defaults-heading">Operating defaults</h2><p>Regional and communication settings for this workspace.</p></div>
+            </div>
+            <div class="form-grid form-grid-two">
+              {% include "tenants/includes/form_field.html" with field=form.status %}
+              {% include "tenants/includes/form_field.html" with field=form.timezone %}
+              {% include "tenants/includes/form_field.html" with field=form.default_language %}
+              {% include "tenants/includes/form_field.html" with field=form.contact_email %}
+            </div>
+          </section>
+        {% elif form_variant == "service-area" %}
+          <section class="form-card" aria-labelledby="area-heading">
+            <div class="form-card-heading">
+              <span class="form-step">01</span>
+              <div><h2 id="area-heading">Area details</h2><p>Name this coverage area and connect it to an organization.</p></div>
+            </div>
+            <div class="form-grid form-grid-two">
+              {% include "tenants/includes/form_field.html" with field=form.tenant %}
+              {% include "tenants/includes/form_field.html" with field=form.name %}
+              {% include "tenants/includes/form_field.html" with field=form.code %}
+              <div class="form-grid-span">{% include "tenants/includes/form_field.html" with field=form.description %}</div>
+              <div class="form-grid-span">{% include "tenants/includes/form_field.html" with field=form.is_active %}</div>
+            </div>
+          </section>
+          <section class="form-card form-card-map" aria-labelledby="boundary-heading">
+            <div class="form-card-heading">
+              <span class="form-step">02</span>
+              <div><h2 id="boundary-heading">Coverage boundary</h2><p>Draw the exact area where incoming reports should be routed.</p></div>
+            </div>
+            {% include "tenants/includes/form_field.html" with field=form.boundary %}
+          </section>
+        {% else %}
+          <section class="form-card" aria-labelledby="access-heading">
+            <div class="form-card-heading">
+              <span class="form-step">01</span>
+              <div><h2 id="access-heading">Account access</h2><p>Connect one existing account to an organization workspace.</p></div>
+            </div>
+            <div class="form-grid">
+              {% include "tenants/includes/form_field.html" with field=form.user %}
+              {% include "tenants/includes/form_field.html" with field=form.tenant %}
+              {% include "tenants/includes/form_field.html" with field=form.status %}
+            </div>
+          </section>
+        {% endif %}
+      </div>
+
+      <aside class="form-guidance" aria-label="Form guidance">
+        <div class="guidance-icon" aria-hidden="true">i</div>
+        {% if form_variant == "organization" %}
+          <h2>Before you continue</h2>
+          <p>The slug becomes a stable system reference. Choose it carefully; changing it later may affect integrations.</p>
+          <ul><li>Use the official organization name</li><li>Use an IANA timezone such as Asia/Karachi</li><li>Pending status is safest during setup</li></ul>
+        {% elif form_variant == "service-area" %}
+          <h2>Drawing a boundary</h2>
+          <p>Use the polygon control on the map and close every shape by returning to its starting point.</p>
+          <ul><li>Avoid overlapping areas in one organization</li><li>Use a short, recognizable code</li><li>Inactive areas will not route reports</li></ul>
+        {% else %}
+          <h2>Membership access</h2>
+          <p>A membership opens the organization workspace. Roles and department permissions remain separate.</p>
+          <ul><li>Invited is the safest initial status</li><li>Only use Active for confirmed accounts</li><li>One account can join multiple organizations</li></ul>
+        {% endif %}
+      </aside>
+    </div>
+
+    <div class="form-action-bar">
+      <p><strong>{% if object %}Update{% else %}Create{% endif %} record</strong><span>Review the information before saving.</span></p>
+      <div><a class="button button-secondary" href="{% url cancel_url_name %}">Cancel</a><button class="button button-primary" type="submit">{{ submit_label }}</button></div>
+    </div>
+  </form>
 {% endblock %}
 
-{% block extra_scripts %}
-  {{ form.media.js }}
-{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}{% endblock %}

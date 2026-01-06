@@ -103,6 +103,7 @@ class TenantCreateView(EntityFormMixin, CreateView):
         "form_intro": "Create an isolated government organization in CivicFlow.",
         "submit_label": "Add organization",
         "cancel_url_name": "tenants:list",
+        "form_variant": "organization",
     }
 
 
@@ -129,6 +130,7 @@ class ServiceAreaCreateView(EntityFormMixin, CreateView):
         "form_intro": "Define the organization and geographic boundary used to route reports.",
         "submit_label": "Add service area",
         "cancel_url_name": "tenants:service-area-list",
+        "form_variant": "service-area",
     }
 
 
@@ -155,6 +157,7 @@ class TenantMembershipCreateView(EntityFormMixin, CreateView):
         "form_intro": "Connect an existing CivicFlow account to an organization.",
         "submit_label": "Add membership",
         "cancel_url_name": "tenants:membership-list",
+        "form_variant": "membership",
     }
 
     def form_valid(self, form):
