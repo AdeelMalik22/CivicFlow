@@ -666,7 +666,9 @@ h3 {
 
 .form-page-header {
   align-items: center;
-  margin-bottom: 1.75rem;
+  margin: 0;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-bottom: 1px solid var(--line);
 }
 
 .form-page-header h1 {
@@ -697,10 +699,22 @@ h3 {
   gap: 1.4rem;
 }
 
+.form-primary-surface {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 0.95rem;
+  background: white;
+  box-shadow: 0 2px 8px rgba(15, 35, 64, 0.05);
+}
+
 .form-section-stack,
 .form-grid {
   display: grid;
   gap: 1.25rem;
+}
+
+.form-primary-surface .form-section-stack {
+  gap: 0;
 }
 
 .form-card {
@@ -709,6 +723,16 @@ h3 {
   border-radius: 0.9rem;
   background: white;
   box-shadow: 0 1px 3px rgba(15, 35, 64, 0.04);
+}
+
+.form-primary-surface .form-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.form-primary-surface .form-card + .form-card {
+  border-top: 1px solid var(--line);
 }
 
 .form-card-heading {

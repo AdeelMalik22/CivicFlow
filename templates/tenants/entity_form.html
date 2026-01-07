@@ -11,15 +11,6 @@
     </a>
   </nav>
 
-  <div class="page-header form-page-header">
-    <div>
-      <p class="eyebrow">{{ eyebrow }}</p>
-      <h1>{{ form_title }}</h1>
-      <p>{{ form_intro }}</p>
-    </div>
-    <span class="form-mode-badge">{% if object %}Editing record{% else %}New record{% endif %}</span>
-  </div>
-
   <form method="post" class="entity-form" novalidate>
     {% csrf_token %}
     {% if form.non_field_errors %}
@@ -30,8 +21,18 @@
     {% endif %}
 
     <div class="entity-form-layout">
-      <div class="form-section-stack">
-        {% if form_variant == "organization" %}
+      <div class="form-primary-surface">
+        <div class="page-header form-page-header">
+          <div>
+            <p class="eyebrow">{{ eyebrow }}</p>
+            <h1>{{ form_title }}</h1>
+            <p>{{ form_intro }}</p>
+          </div>
+          <span class="form-mode-badge">{% if object %}Editing record{% else %}New record{% endif %}</span>
+        </div>
+
+        <div class="form-section-stack">
+          {% if form_variant == "organization" %}
           <section class="form-card" aria-labelledby="identity-heading">
             <div class="form-card-heading">
               <span class="form-step">01</span>
@@ -54,7 +55,7 @@
               {% include "tenants/includes/form_field.html" with field=form.contact_email %}
             </div>
           </section>
-        {% elif form_variant == "service-area" %}
+          {% elif form_variant == "service-area" %}
           <section class="form-card" aria-labelledby="area-heading">
             <div class="form-card-heading">
               <span class="form-step">01</span>
@@ -75,7 +76,7 @@
             </div>
             {% include "tenants/includes/form_field.html" with field=form.boundary %}
           </section>
-        {% else %}
+          {% else %}
           <section class="form-card" aria-labelledby="access-heading">
             <div class="form-card-heading">
               <span class="form-step">01</span>
@@ -87,7 +88,8 @@
               {% include "tenants/includes/form_field.html" with field=form.status %}
             </div>
           </section>
-        {% endif %}
+          {% endif %}
+        </div>
       </div>
 
       <aside class="form-guidance" aria-label="Form guidance">
