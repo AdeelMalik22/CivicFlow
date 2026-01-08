@@ -32,6 +32,12 @@
         </div>
 
         <div class="form-section-stack">
+          {% if form_variant == "membership" and form.no_organizations %}
+            <div class="prerequisite-alert" role="status">
+              <div><strong>An organization is required first</strong><p>Memberships must belong to an organization workspace.</p></div>
+              <a class="button button-secondary button-small" href="{% url 'tenants:add' %}">Create organization</a>
+            </div>
+          {% endif %}
           {% if form_variant == "organization" %}
           <section class="form-card" aria-labelledby="identity-heading">
             <div class="form-card-heading">
@@ -83,7 +89,11 @@
               <div><h2 id="access-heading">Account access</h2><p>Connect one existing account to an organization workspace.</p></div>
             </div>
             <div class="form-grid">
-              {% include "tenants/includes/form_field.html" with field=form.user %}
+              {% include "tenants/includes/form_field.html" with field=form.email %}
+              <div class="form-grid form-grid-two">
+                {% include "tenants/includes/form_field.html" with field=form.first_name %}
+                {% include "tenants/includes/form_field.html" with field=form.last_name %}
+              </div>
               {% include "tenants/includes/form_field.html" with field=form.tenant %}
               {% include "tenants/includes/form_field.html" with field=form.status %}
             </div>
@@ -112,7 +122,7 @@
 
     <div class="form-action-bar">
       <p><strong>{% if object %}Update{% else %}Create{% endif %} record</strong><span>Review the information before saving.</span></p>
-      <div><a class="button button-secondary" href="{% url cancel_url_name %}">Cancel</a><button class="button button-primary" type="submit">{{ submit_label }}</button></div>
+      <div><a class="button button-secondary" href="{% url cancel_url_name %}">Cancel</a><button class="button button-primary" type="submit"{% if form.no_organizations %} disabled{% endif %}>{{ submit_label }}</button></div>
     </div>
   </form>
 {% endblock %}

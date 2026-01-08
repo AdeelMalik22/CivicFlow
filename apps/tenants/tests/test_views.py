@@ -196,18 +196,26 @@ def test_staff_can_add_and_edit_organization_in_workspace(client: Client):
 @pytest.mark.django_db
 def test_staff_can_add_membership_and_inviter_is_recorded(client: Client):
     staff = User.objects.create_user(email="staff@example.com", is_staff=True)
-    member = User.objects.create_user(email="member@example.com")
     tenant = Tenant.objects.create(name="City Services", slug="city-services")
     client.force_login(staff)
 
     response = client.post(
         reverse("tenants:membership-add"),
-        {"tenant": tenant.pk, "user": member.pk, "status": TenantMembership.Status.INVITED},
+        {
+            "email": "new-member@example.com",
+            "first_name": "New",
+            "last_name": "Member",
+            "tenant": tenant.pk,
+            "status": TenantMembership.Status.INVITED,
+        },
     )
 
     membership = TenantMembership.objects.get()
     assert response.status_code == 302
     assert membership.invited_by == staff
+    assert membership.user.email == "new-member@example.com"
+    assert membership.user.get_full_name() == "New Member"
+    assert not membership.user.has_usable_password()
 
 
 @pytest.mark.django_db

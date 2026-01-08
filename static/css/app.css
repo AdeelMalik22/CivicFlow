@@ -735,6 +735,35 @@ h3 {
   border-top: 1px solid var(--line);
 }
 
+.prerequisite-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 1.5rem 0;
+  padding: 1rem;
+  color: #70410b;
+  border: 1px solid #efcf9b;
+  border-radius: 0.7rem;
+  background: #fff8e8;
+}
+
+.prerequisite-alert strong,
+.prerequisite-alert p {
+  display: block;
+  margin: 0;
+}
+
+.prerequisite-alert p {
+  color: #80623c;
+  font-size: 0.8rem;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .form-card-heading {
   display: grid;
   grid-template-columns: 2.2rem minmax(0, 1fr);
@@ -2039,6 +2068,11 @@ h3 {
 
   .form-action-bar .button {
     justify-content: center;
+  }
+
+  .prerequisite-alert {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
