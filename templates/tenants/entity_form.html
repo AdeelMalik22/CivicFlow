@@ -100,6 +100,17 @@
           </section>
           {% endif %}
         </div>
+
+        <div class="form-action-bar">
+          <p>
+            <strong>{% if object %}Update{% else %}Create{% endif %} record</strong>
+            <span>Review the information before saving.</span>
+          </p>
+          <div>
+            <a class="button button-secondary" href="{% url cancel_url_name %}">Cancel</a>
+            <button class="button button-primary" type="submit"{% if form.no_organizations %} disabled{% endif %}>{{ submit_label }}</button>
+          </div>
+        </div>
       </div>
 
       <aside class="form-guidance" aria-label="Form guidance">
@@ -118,11 +129,6 @@
           <ul><li>Invited is the safest initial status</li><li>Only use Active for confirmed accounts</li><li>One account can join multiple organizations</li></ul>
         {% endif %}
       </aside>
-    </div>
-
-    <div class="form-action-bar">
-      <p><strong>{% if object %}Update{% else %}Create{% endif %} record</strong><span>Review the information before saving.</span></p>
-      <div><a class="button button-secondary" href="{% url cancel_url_name %}">Cancel</a><button class="button button-primary" type="submit"{% if form.no_organizations %} disabled{% endif %}>{{ submit_label }}</button></div>
     </div>
   </form>
 {% endblock %}

@@ -926,19 +926,13 @@ h3 {
 }
 
 .form-action-bar {
-  position: sticky;
-  bottom: 0;
-  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--line);
-  border-radius: 0.85rem;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 -8px 28px rgba(15, 35, 64, 0.08);
-  backdrop-filter: blur(12px);
+  padding: 1.25rem clamp(1.25rem, 2.5vw, 2rem);
+  border-top: 1px solid var(--line);
+  background: #f8fafc;
 }
 
 .form-action-bar p,
