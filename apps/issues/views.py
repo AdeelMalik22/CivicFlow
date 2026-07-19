@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf import settings
+from django.core.mail import send_mail
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -204,10 +206,28 @@ class IssueOperationsDetailView(LoginRequiredMixin, DetailView):
                 IssueInternalNote.objects.create(issue=self.object, author=request.user, body=note)
             message = form.cleaned_data["public_message"].strip()
             if message or old_status != self.object.status:
-                IssueStatusEvent.objects.create(
+                event = IssueStatusEvent.objects.create(
                     issue=self.object, status=self.object.status,
                     public_message=message or f"Report status updated to {self.object.get_status_display()}.",
                     actor=request.user,
                 )
+                if (
+                    self.object.contact_preference == Issue.ContactPreference.EMAIL
+                    and self.object.contact_email
+                    and old_status != self.object.status
+                ):
+                    notification = event.public_message
+                    status_label = self.object.get_status_display()
+                    from django.db import transaction
+                    transaction.on_commit(lambda: send_mail(
+                        subject=f"CivicFlow update: {self.object.reference}",
+                        message=(
+                            f"There is an update to your CivicFlow report {self.object.reference}.\n\n"
+                            f"Status: {status_label}\n{notification}\n\n"
+                            "Use your existing reference and verification code to view the full timeline."
+                        ),
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[self.object.contact_email],
+                    ))
             return redirect("issues:report_detail", pk=self.object.pk)
         return self.render_to_response(self.get_context_data(update_form=form))
