@@ -86,7 +86,7 @@ class PublicIssueTrackingView(TemplateView):
         context = super().get_context_data(**kwargs)
         issue = (
             Issue.objects.select_related("service_area")
-            .prefetch_related("status_events")
+            .prefetch_related("status_events", "attachments")
             .filter(reference=kwargs["reference"].upper())
             .first()
         )
