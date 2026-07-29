@@ -1,9 +1,14 @@
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.staticfiles import finders
 from django.test import Client
 from django.urls import reverse
 
 User = get_user_model()
+
+
+def test_application_stylesheet_is_discoverable():
+    assert finders.find("css/app.css") is not None
 
 
 def test_sign_in_page_uses_email_field(client: Client):
