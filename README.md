@@ -38,3 +38,19 @@ python manage.py runserver
 SQLite is used when `DATABASE_URL` is omitted, which is convenient for the
 earliest UI work. PostgreSQL/PostGIS remains the required integration and
 production database.
+
+Run the local quality suite:
+
+```bash
+make check
+make test
+```
+
+Alternatively, start the web application, PostgreSQL/PostGIS, Redis, and a
+Celery worker together:
+
+```bash
+docker compose up --build
+```
+
+The application is available at <http://localhost:8000/>.

@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: civicflow
+      POSTGRES_USER: civicflow
+      POSTGRES_PASSWORD: civicflow
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U civicflow -d civicflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - redis_data:/data
+
+  web:
+    build: .
+    command:
+      - /bin/sh
+      - -c
+      - python manage.py migrate && uvicorn civicflow.asgi:application --host 0.0.0.0 --port 8000 --no-access-log
+    environment:
+      DJANGO_SETTINGS_MODULE: civicflow.settings.local
+      DJANGO_SECRET_KEY: local-container-only-secret-key
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      DATABASE_URL: postgresql://civicflow:civicflow@db:5432/civicflow
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: ["celery", "-A", "civicflow", "worker", "--loglevel=INFO"]
+    environment:
+      DJANGO_SETTINGS_MODULE: civicflow.settings.local
+      DJANGO_SECRET_KEY: local-container-only-secret-key
+      DATABASE_URL: postgresql://civicflow:civicflow@db:5432/civicflow
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
