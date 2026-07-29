@@ -16,12 +16,24 @@ Including another URLconf
 """
 
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from apps.common.views import liveness, readiness
+from apps.common.views import HomeView, liveness, readiness
 
 urlpatterns = [
+    path("", HomeView.as_view(), name="home"),
+    path(
+        "sign-in/",
+        auth_views.LoginView.as_view(template_name="registration/login.html"),
+        name="login",
+    ),
+    path(
+        "sign-out/",
+        auth_views.LogoutView.as_view(next_page="home"),
+        name="logout",
+    ),
     path("admin/", admin.site.urls),
     path("health/live/", liveness, name="health-live"),
     path("health/ready/", readiness, name="health-ready"),

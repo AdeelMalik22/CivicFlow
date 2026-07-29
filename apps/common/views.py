@@ -3,6 +3,11 @@ from django.db.utils import OperationalError
 from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
+from django.views.generic import TemplateView
+
+
+class HomeView(TemplateView):
+    template_name = "home.html"
 
 
 @require_GET

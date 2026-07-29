@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}CivicFlow — Public infrastructure, clearly tracked{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Public infrastructure transparency</p>
+        <h1>Report an infrastructure issue. See what happens next.</h1>
+        <p class="hero-summary">
+          CivicFlow connects citizens and public-service teams through one visible,
+          accountable journey—from the first report to verified completion.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#report-placeholder">Report an issue</a>
+          <a class="button button-ghost" href="#track-placeholder">Track a report</a>
+        </div>
+        <p class="availability-note">
+          The reporting workflow will open during the pilot rollout.
+        </p>
+      </div>
+
+      <div class="status-card" aria-label="Example project progress">
+        <div class="status-card-header">
+          <div>
+            <p class="card-label">Example project</p>
+            <h2>Streetlight repair</h2>
+          </div>
+          <span class="status-badge">In progress</span>
+        </div>
+        <ol class="progress-list">
+          <li class="progress-complete">
+            <span class="progress-marker" aria-hidden="true">✓</span>
+            <div>
+              <strong>Report received</strong>
+              <span>Location and evidence recorded</span>
+            </div>
+          </li>
+          <li class="progress-complete">
+            <span class="progress-marker" aria-hidden="true">✓</span>
+            <div>
+              <strong>Reviewed</strong>
+              <span>Assigned to the responsible department</span>
+            </div>
+          </li>
+          <li class="progress-current">
+            <span class="progress-marker" aria-hidden="true"></span>
+            <div>
+              <strong>Work in progress</strong>
+              <span>Contractor updates are being recorded</span>
+            </div>
+          </li>
+          <li>
+            <span class="progress-marker" aria-hidden="true"></span>
+            <div>
+              <strong>Inspection and closure</strong>
+              <span>Completion requires independent verification</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div class="section-heading">
+        <p class="eyebrow">How it works</p>
+        <h2>One trusted record from report to resolution</h2>
+        <p>Clear stages make ownership, progress, and decisions easier to understand.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span class="feature-number">01</span>
+          <h3>Report</h3>
+          <p>Share the issue, its location, and supporting photos through a guided form.</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-number">02</span>
+          <h3>Follow</h3>
+          <p>Use a secure reference to see public milestones and meaningful status changes.</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-number">03</span>
+          <h3>Verify</h3>
+          <p>Completion evidence and inspection decisions are recorded before payment.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tinted" id="accountability">
+    <div class="container accountability-grid">
+      <div>
+        <p class="eyebrow">Accountability by design</p>
+        <h2>Every important action has an owner and history.</h2>
+      </div>
+      <div class="principle-list">
+        <div>
+          <h3>Role-based decisions</h3>
+          <p>Each stakeholder sees and performs only the work assigned to their role.</p>
+        </div>
+        <div>
+          <h3>Evidence-backed delivery</h3>
+          <p>Progress, completion, inspection, and payment decisions retain their evidence.</p>
+        </div>
+        <div>
+          <h3>Citizen-safe transparency</h3>
+          <p>Useful project progress is public while personal and confidential data stays protected.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section launch-grid" aria-label="Upcoming CivicFlow services">
+    <div class="container action-grid">
+      <article class="action-card" id="report-placeholder">
+        <p class="eyebrow">For citizens</p>
+        <h2>Report a local issue</h2>
+        <p>The guided reporting form is the first product workflow in the next delivery phase.</p>
+        <span class="coming-soon">Coming in Phase 2</span>
+      </article>
+      <article class="action-card" id="track-placeholder">
+        <p class="eyebrow">Public tracking</p>
+        <h2>Follow a report</h2>
+        <p>Secure reference tracking will show decisions and project milestones without exposing private data.</p>
+        <span class="coming-soon">Coming in Phase 2</span>
+      </article>
+    </div>
+  </section>
+{% endblock %}
