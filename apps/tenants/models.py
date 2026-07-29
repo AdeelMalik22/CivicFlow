@@ -1,12 +1,14 @@
 import uuid
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.functions import Lower
+from django.utils import timezone
 
 
 def validate_timezone(value: str) -> None:
@@ -182,3 +184,90 @@ class ServiceArea(models.Model):
         super().clean()
         if self.boundary and (self.boundary.empty or not self.boundary.valid):
             raise ValidationError({"boundary": "Enter a non-empty, valid multipolygon boundary."})
+
+
+class TenantMembershipQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(
+            status=TenantMembership.Status.ACTIVE,
+            tenant__status=Tenant.Status.ACTIVE,
+            user__is_active=True,
+        )
+
+    def for_user(self, user):
+        return self.filter(user=user).select_related("tenant")
+
+
+class TenantMembership(models.Model):
+    """A user's lifecycle-bound relationship with one CivicFlow tenant."""
+
+    class Status(models.TextChoices):
+        INVITED = "invited", "Invited"
+        ACTIVE = "active", "Active"
+        SUSPENDED = "suspended", "Suspended"
+
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    tenant = models.ForeignKey(
+        Tenant,
+        on_delete=models.PROTECT,
+        related_name="memberships",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="tenant_memberships",
+    )
+    status = models.CharField(max_length=16, choices=Status, default=Status.INVITED)
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="tenant_invitations_sent",
+    )
+    invited_at = models.DateTimeField(default=timezone.now)
+    activated_at = models.DateTimeField(null=True, blank=True)
+    suspended_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = TenantMembershipQuerySet.as_manager()
+
+    class Meta:
+        ordering = ("tenant__name", "user__email")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("tenant", "user"),
+                name="membership_tenant_user_unique",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=("tenant", "status"),
+                name="membership_tenant_status_idx",
+            ),
+            models.Index(
+                fields=("user", "status"),
+                name="membership_user_status_idx",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user.email} — {self.tenant.name}"
+
+    def save(self, *args, **kwargs) -> None:
+        now = timezone.now()
+        if self.status == self.Status.ACTIVE:
+            self.activated_at = self.activated_at or now
+            self.suspended_at = None
+        elif self.status == self.Status.SUSPENDED:
+            self.suspended_at = self.suspended_at or now
+        super().save(*args, **kwargs)
+
+    def activate(self) -> None:
+        self.status = self.Status.ACTIVE
+        self.save(update_fields=("status", "activated_at", "suspended_at", "updated_at"))
+
+    def suspend(self) -> None:
+        self.status = self.Status.SUSPENDED
+        self.save(update_fields=("status", "suspended_at", "updated_at"))

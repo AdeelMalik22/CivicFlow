@@ -1136,6 +1136,10 @@ h3 {
   background: white;
 }
 
+.directory-summary-four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .directory-summary > div {
   padding: 1.25rem 1.5rem;
 }
@@ -1396,6 +1400,39 @@ h3 {
 
 .entity-avatar-map {
   color: #175cd3;
+}
+
+.entity-avatar-person {
+  color: #5c3bb3;
+  background: #eee9ff;
+  border-radius: 50%;
+}
+
+.membership-status-active {
+  color: #05603f;
+  background: #e2f6ed;
+}
+
+.membership-status-active > span {
+  background: #12a571;
+}
+
+.membership-status-invited {
+  color: #174a91;
+  background: #e4efff;
+}
+
+.membership-status-invited > span {
+  background: #3279df;
+}
+
+.membership-status-suspended {
+  color: #8f2525;
+  background: #fde9e9;
+}
+
+.membership-status-suspended > span {
+  background: #d64545;
 }
 
 /* Error states */

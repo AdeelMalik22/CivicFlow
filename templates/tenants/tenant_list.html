@@ -46,6 +46,7 @@
               <th scope="col">Status</th>
               <th scope="col">Timezone</th>
               <th scope="col">Departments</th>
+              <th scope="col">Members</th>
               <th scope="col"><span class="sr-only">Actions</span></th>
             </tr>
           </thead>
@@ -70,6 +71,10 @@
                 <td>
                   <strong>{{ tenant.active_department_count }}</strong>
                   <span class="muted-value">of {{ tenant.department_count }} active</span>
+                </td>
+                <td>
+                  <strong>{{ tenant.active_membership_count }}</strong>
+                  <span class="muted-value">of {{ tenant.membership_count }} active</span>
                 </td>
                 <td class="table-action">
                   <a href="{% url 'admin:tenants_tenant_change' tenant.pk %}">

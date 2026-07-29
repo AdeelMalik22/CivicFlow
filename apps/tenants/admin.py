@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
 
-from .models import Department, ServiceArea, Tenant
+from .models import Department, ServiceArea, Tenant, TenantMembership
 
 
 class DepartmentInline(admin.TabularInline):
@@ -41,3 +41,19 @@ class ServiceAreaAdmin(GISModelAdmin):
     search_fields = ("name", "code", "tenant__name")
     readonly_fields = ("public_id", "created_at", "updated_at")
     autocomplete_fields = ("tenant",)
+
+
+@admin.register(TenantMembership)
+class TenantMembershipAdmin(admin.ModelAdmin):
+    list_display = ("user", "tenant", "status", "invited_at", "updated_at")
+    list_filter = ("status", "tenant")
+    search_fields = ("user__email", "user__first_name", "user__last_name", "tenant__name")
+    readonly_fields = (
+        "public_id",
+        "invited_at",
+        "activated_at",
+        "suspended_at",
+        "created_at",
+        "updated_at",
+    )
+    autocomplete_fields = ("tenant", "user", "invited_by")

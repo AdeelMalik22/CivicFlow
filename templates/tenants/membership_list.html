@@ -1,0 +1,111 @@
+{% extends "workspace/base.html" %}
+
+{% block title %}Memberships — CivicFlow{% endblock %}
+
+{% block workspace_content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Identity administration</p>
+      <h1>Tenant memberships</h1>
+      <p>Controlled relationships between CivicFlow accounts and government organizations.</p>
+    </div>
+    <a class="button button-primary" href="{% url 'admin:tenants_tenantmembership_add' %}">
+      Add membership
+    </a>
+  </div>
+
+  <section class="directory-summary directory-summary-four" aria-label="Membership summary">
+    <div>
+      <span>Memberships</span>
+      <strong>{{ memberships|length }}</strong>
+    </div>
+    <div>
+      <span>Active</span>
+      <strong>{{ active_membership_count }}</strong>
+    </div>
+    <div>
+      <span>Awaiting activation</span>
+      <strong>{{ invited_membership_count }}</strong>
+    </div>
+    <div>
+      <span>Organizations</span>
+      <strong>{{ tenant_count }}</strong>
+    </div>
+  </section>
+
+  <section class="data-panel" aria-labelledby="membership-list-title">
+    <div class="data-panel-header">
+      <div>
+        <h2 id="membership-list-title">Configured memberships</h2>
+        <p>Roles and department assignments will be managed separately from membership state.</p>
+      </div>
+    </div>
+
+    {% if memberships %}
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Account</th>
+              <th scope="col">Organization</th>
+              <th scope="col">Status</th>
+              <th scope="col">Invited</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for membership in memberships %}
+              <tr>
+                <td>
+                  <div class="entity-cell">
+                    <span class="entity-avatar entity-avatar-person" aria-hidden="true">
+                      {{ membership.user.email|first|upper }}
+                    </span>
+                    <div>
+                      <strong>{{ membership.user.get_full_name|default:membership.user.email }}</strong>
+                      {% if membership.user.get_full_name %}
+                        <span>{{ membership.user.email }}</span>
+                      {% else %}
+                        <span>Account holder</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+                <td>{{ membership.tenant.name }}</td>
+                <td>
+                  <span class="table-status membership-status-{{ membership.status }}">
+                    <span aria-hidden="true"></span>{{ membership.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <time datetime="{{ membership.invited_at|date:'c' }}">
+                    {{ membership.invited_at|date:"d M Y" }}
+                  </time>
+                  {% if membership.invited_by %}
+                    <span class="muted-value">by {{ membership.invited_by }}</span>
+                  {% endif %}
+                </td>
+                <td class="table-action">
+                  <a href="{% url 'admin:tenants_tenantmembership_change' membership.pk %}">
+                    Manage<span class="sr-only"> {{ membership.user.email }}</span>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-state-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3Zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3Z"/></svg>
+        </span>
+        <h3>No tenant memberships</h3>
+        <p>Connect an existing CivicFlow account to an organization before assigning roles.</p>
+        <a class="button button-primary" href="{% url 'admin:tenants_tenantmembership_add' %}">
+          Add first membership
+        </a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
