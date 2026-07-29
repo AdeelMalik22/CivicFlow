@@ -17,7 +17,18 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+from apps.common.views import liveness, readiness
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("health/live/", liveness, name="health-live"),
+    path("health/ready/", readiness, name="health-ready"),
+    path("api/v1/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path(
+        "api/v1/docs/",
+        SpectacularSwaggerView.as_view(url_name="api-schema"),
+        name="api-docs",
+    ),
 ]
