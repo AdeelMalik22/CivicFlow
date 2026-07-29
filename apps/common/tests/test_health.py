@@ -11,7 +11,7 @@ def test_home_page_renders_public_product_shell(client: Client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert b"Report an infrastructure issue" in response.content
+    assert b"Public infrastructure, clearly tracked." in response.content
 
 
 def test_liveness_is_public_and_returns_request_id(client: Client):

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Service unavailable — CivicFlow{% endblock %}
+
+{% block content %}
+  <section class="error-page">
+    <div class="error-content">
+      <p class="error-code">500</p>
+      <p class="eyebrow">Temporary service issue</p>
+      <h1>CivicFlow can’t complete this request right now.</h1>
+      <p>The issue has been recorded. Please wait a moment and try again.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="{% url 'home' %}">Return home</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import connections
 from django.db.utils import OperationalError
 from django.http import JsonResponse
@@ -8,6 +9,12 @@ from django.views.generic import TemplateView
 
 class HomeView(TemplateView):
     template_name = "home.html"
+
+
+class WorkspaceView(LoginRequiredMixin, TemplateView):
+    """Authenticated starting point until role-specific modules are delivered."""
+
+    template_name = "workspace/home.html"
 
 
 @require_GET

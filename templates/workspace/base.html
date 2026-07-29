@@ -1,0 +1,88 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CivicFlow secure workspace">
+    <title>{% block title %}Workspace — CivicFlow{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  </head>
+  <body class="workspace-body">
+    <a class="skip-link" href="#workspace-content">Skip to main content</a>
+
+    <div class="workspace-shell">
+      <aside class="workspace-sidebar" aria-label="Workspace navigation">
+        <a class="brand workspace-brand" href="{% url 'workspace' %}">
+          <span class="brand-mark" aria-hidden="true">CF</span>
+          <span>CivicFlow</span>
+        </a>
+
+        <div class="workspace-context">
+          <span class="context-label">Current workspace</span>
+          <strong>Platform foundation</strong>
+        </div>
+
+        <nav class="workspace-nav">
+          <a class="workspace-nav-item is-active" href="{% url 'workspace' %}" aria-current="page">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg>
+            </span>
+            Overview
+          </a>
+          <span class="workspace-nav-heading">Product modules</span>
+          <span class="workspace-nav-item is-disabled" aria-disabled="true">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm3 4v2h10V8H7Zm0 4v2h7v-2H7Z"/></svg>
+            </span>
+            Reports
+            <span class="nav-tag">Next</span>
+          </span>
+          <span class="workspace-nav-item is-disabled" aria-disabled="true">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3V6Z"/></svg>
+            </span>
+            Projects
+          </span>
+          <span class="workspace-nav-item is-disabled" aria-disabled="true">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5V4Zm3 4v2h8V8H8Zm0 4v2h8v-2H8Z"/></svg>
+            </span>
+            Procurement
+          </span>
+        </nav>
+
+        <div class="workspace-sidebar-footer">
+          <a href="{% url 'home' %}">View public site</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Sign out</button>
+          </form>
+        </div>
+      </aside>
+
+      <div class="workspace-main">
+        <header class="workspace-header">
+          <div>
+            <button class="mobile-menu-button" type="button" aria-label="Open navigation" disabled>
+              <span></span><span></span><span></span>
+            </button>
+          </div>
+          <div class="workspace-user">
+            <span class="workspace-user-copy">
+              <strong>{{ request.user.get_full_name|default:request.user.email }}</strong>
+              <span>{% if request.user.is_staff %}Platform staff{% else %}Authenticated user{% endif %}</span>
+            </span>
+            <span class="user-avatar" aria-hidden="true">
+              {{ request.user.email|first|upper }}
+            </span>
+          </div>
+        </header>
+
+        <main id="workspace-content" class="workspace-content">
+          {% block workspace_content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

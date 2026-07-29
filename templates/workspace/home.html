@@ -1,0 +1,103 @@
+{% extends "workspace/base.html" %}
+
+{% block title %}Overview — CivicFlow{% endblock %}
+
+{% block workspace_content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Workspace overview</p>
+      <h1>Welcome to CivicFlow</h1>
+      <p>The secure platform foundation is ready for the first operational workflow.</p>
+    </div>
+    {% if request.user.is_staff %}
+      <a class="button button-secondary" href="{% url 'admin:index' %}">Open administration</a>
+    {% endif %}
+  </div>
+
+  <section class="readiness-panel" aria-labelledby="readiness-title">
+    <div class="readiness-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="m9.2 16.6-4.3-4.3 1.4-1.4 2.9 2.9 8.5-8.5 1.4 1.4-9.9 9.9Z"/></svg>
+    </div>
+    <div>
+      <p class="panel-kicker">Foundation status</p>
+      <h2 id="readiness-title">Core platform services are ready</h2>
+      <p>
+        Secure accounts, database connectivity, request observability, API
+        documentation, and automated quality checks are operational.
+      </p>
+    </div>
+    <span class="status-badge status-success">Operational</span>
+  </section>
+
+  <div class="workspace-grid">
+    <section class="workspace-card" aria-labelledby="next-module-title">
+      <div class="workspace-card-header">
+        <div>
+          <p class="panel-kicker">Next delivery slice</p>
+          <h2 id="next-module-title">Citizen reporting and issue triage</h2>
+        </div>
+        <span class="phase-badge">Phase 2</span>
+      </div>
+      <p>
+        The next module will connect citizen submissions to a controlled
+        government review queue and public-safe tracking timeline.
+      </p>
+      <ol class="delivery-list">
+        <li>
+          <span>1</span>
+          <div>
+            <strong>Tenant and service-area foundation</strong>
+            <p>Define organizational boundaries, departments, and supported locations.</p>
+          </div>
+        </li>
+        <li>
+          <span>2</span>
+          <div>
+            <strong>Citizen issue submission</strong>
+            <p>Capture category, description, location, and protected evidence.</p>
+          </div>
+        </li>
+        <li>
+          <span>3</span>
+          <div>
+            <strong>Officer review workspace</strong>
+            <p>Assign, clarify, reject, approve, or link duplicate reports.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <aside class="workspace-card account-card" aria-labelledby="account-title">
+      <div class="workspace-card-header">
+        <div>
+          <p class="panel-kicker">Signed-in account</p>
+          <h2 id="account-title">Access details</h2>
+        </div>
+      </div>
+      <dl class="detail-list">
+        <div>
+          <dt>Email address</dt>
+          <dd>{{ request.user.email }}</dd>
+        </div>
+        <div>
+          <dt>Account status</dt>
+          <dd><span class="inline-status"><span></span> Active</span></dd>
+        </div>
+        <div>
+          <dt>Administrative access</dt>
+          <dd>{% if request.user.is_staff %}Enabled{% else %}Not assigned{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Account reference</dt>
+          <dd class="reference-value">{{ request.user.public_id }}</dd>
+        </div>
+      </dl>
+      {% if request.user.is_staff %}
+        <div class="account-actions">
+          <a href="{% url 'admin:index' %}">Manage platform settings</a>
+          <a href="{% url 'api-docs' %}">Review API documentation</a>
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

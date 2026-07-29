@@ -20,10 +20,15 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from apps.common.views import HomeView, liveness, readiness
+from apps.common.views import HomeView, WorkspaceView, liveness, readiness
+
+admin.site.site_header = "CivicFlow administration"
+admin.site.site_title = "CivicFlow admin"
+admin.site.index_title = "Platform configuration"
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
+    path("workspace/", WorkspaceView.as_view(), name="workspace"),
     path(
         "sign-in/",
         auth_views.LoginView.as_view(template_name="registration/login.html"),
