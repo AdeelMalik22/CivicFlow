@@ -1,0 +1,97 @@
+{% extends "workspace/base.html" %}
+
+{% block title %}Organizations — CivicFlow{% endblock %}
+
+{% block workspace_content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Platform administration</p>
+      <h1>Organizations</h1>
+      <p>Government tenants and the departments operating within each boundary.</p>
+    </div>
+    <a class="button button-primary" href="{% url 'admin:tenants_tenant_add' %}">
+      Add organization
+    </a>
+  </div>
+
+  <section class="directory-summary" aria-label="Organization summary">
+    <div>
+      <span>Organizations</span>
+      <strong>{{ tenants|length }}</strong>
+    </div>
+    <div>
+      <span>Active</span>
+      <strong>{{ active_tenant_count }}</strong>
+    </div>
+    <div>
+      <span>Departments</span>
+      <strong>{{ total_department_count }}</strong>
+    </div>
+  </section>
+
+  <section class="data-panel" aria-labelledby="organization-list-title">
+    <div class="data-panel-header">
+      <div>
+        <h2 id="organization-list-title">Configured organizations</h2>
+        <p>Each organization is an isolated CivicFlow tenant.</p>
+      </div>
+    </div>
+
+    {% if tenants %}
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Organization</th>
+              <th scope="col">Status</th>
+              <th scope="col">Timezone</th>
+              <th scope="col">Departments</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tenant in tenants %}
+              <tr>
+                <td>
+                  <div class="entity-cell">
+                    <span class="entity-avatar" aria-hidden="true">{{ tenant.name|first|upper }}</span>
+                    <div>
+                      <strong>{{ tenant.name }}</strong>
+                      <span>{{ tenant.slug }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="table-status status-{{ tenant.status }}">
+                    <span aria-hidden="true"></span>{{ tenant.get_status_display }}
+                  </span>
+                </td>
+                <td>{{ tenant.timezone }}</td>
+                <td>
+                  <strong>{{ tenant.active_department_count }}</strong>
+                  <span class="muted-value">of {{ tenant.department_count }} active</span>
+                </td>
+                <td class="table-action">
+                  <a href="{% url 'admin:tenants_tenant_change' tenant.pk %}">
+                    Manage<span class="sr-only"> {{ tenant.name }}</span>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-state-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12h-5v-6H9v6H4Z"/></svg>
+        </span>
+        <h3>No organizations configured</h3>
+        <p>Add the first government organization before configuring service areas or memberships.</p>
+        <a class="button button-primary" href="{% url 'admin:tenants_tenant_add' %}">
+          Add first organization
+        </a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from apps.common.views import HomeView, WorkspaceView, liveness, readiness
@@ -29,6 +29,10 @@ admin.site.index_title = "Platform configuration"
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("workspace/", WorkspaceView.as_view(), name="workspace"),
+    path(
+        "workspace/organizations/",
+        include("apps.tenants.urls"),
+    ),
     path(
         "sign-in/",
         auth_views.LoginView.as_view(template_name="registration/login.html"),
