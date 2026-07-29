@@ -1,6 +1,8 @@
 import uuid
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
@@ -19,6 +21,11 @@ def validate_timezone(value: str) -> None:
 
 
 department_code_validator = RegexValidator(
+    regex=r"^[A-Za-z0-9][A-Za-z0-9_-]*$",
+    message="Use letters, numbers, hyphens, or underscores, starting with a letter or number.",
+)
+
+service_area_code_validator = RegexValidator(
     regex=r"^[A-Za-z0-9][A-Za-z0-9_-]*$",
     message="Use letters, numbers, hyphens, or underscores, starting with a letter or number.",
 )
@@ -109,3 +116,69 @@ class Department(models.Model):
     def save(self, *args, **kwargs) -> None:
         self.code = self.code.upper()
         super().save(*args, **kwargs)
+
+
+class ServiceAreaQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True, tenant__status=Tenant.Status.ACTIVE)
+
+    def covering(self, point: Point, *, tenant: Tenant | None = None):
+        queryset = self.active().filter(boundary__covers=point)
+        if tenant is not None:
+            queryset = queryset.filter(tenant=tenant)
+        return queryset
+
+
+class ServiceArea(models.Model):
+    """A tenant-owned geographic boundary used to route public reports."""
+
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    tenant = models.ForeignKey(
+        Tenant,
+        on_delete=models.PROTECT,
+        related_name="service_areas",
+    )
+    name = models.CharField(max_length=140)
+    code = models.CharField(
+        max_length=30,
+        validators=[service_area_code_validator],
+        help_text="Tenant-unique short code, for example CENTRAL or NORTH-01.",
+    )
+    description = models.TextField(blank=True)
+    boundary = gis_models.MultiPolygonField(
+        srid=4326,
+        help_text="The supported boundary in WGS 84 coordinates.",
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ServiceAreaQuerySet.as_manager()
+
+    class Meta:
+        ordering = ("tenant__name", "name")
+        constraints = [
+            models.UniqueConstraint(
+                Lower("code"),
+                models.F("tenant"),
+                name="area_tenant_code_ci_unique",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=("tenant", "is_active"),
+                name="area_tenant_active_idx",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.tenant.name})"
+
+    def save(self, *args, **kwargs) -> None:
+        self.code = self.code.upper()
+        super().save(*args, **kwargs)
+
+    def clean(self) -> None:
+        super().clean()
+        if self.boundary and (self.boundary.empty or not self.boundary.valid):
+            raise ValidationError({"boundary": "Enter a non-empty, valid multipolygon boundary."})

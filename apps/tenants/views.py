@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Count, Q, QuerySet
 from django.views.generic import ListView
 
-from .models import Tenant
+from .models import ServiceArea, Tenant
 
 
 class StaffRequiredMixin(UserPassesTestMixin):
@@ -34,4 +34,19 @@ class TenantListView(StaffRequiredMixin, ListView):
             tenant.status == Tenant.Status.ACTIVE for tenant in tenants
         )
         context["total_department_count"] = sum(tenant.department_count for tenant in tenants)
+        return context
+
+
+class ServiceAreaListView(StaffRequiredMixin, ListView):
+    template_name = "tenants/service_area_list.html"
+    context_object_name = "service_areas"
+
+    def get_queryset(self) -> QuerySet[ServiceArea]:
+        return ServiceArea.objects.select_related("tenant")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        service_areas = context["service_areas"]
+        context["active_area_count"] = sum(area.is_active for area in service_areas)
+        context["tenant_count"] = len({area.tenant_id for area in service_areas})
         return context

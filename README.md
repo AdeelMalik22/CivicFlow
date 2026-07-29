@@ -14,6 +14,7 @@ Prerequisites:
 
 - Python 3.11 or newer
 - PostgreSQL with PostGIS for integration and production-like development
+- GDAL and GEOS for geographic boundary support
 - Redis for asynchronous jobs
 
 Create the environment and install dependencies:
@@ -25,6 +26,18 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 cp .env.example .env
 ```
+
+On Ubuntu, install the geospatial system dependencies:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y gdal-bin libgdal-dev libgeos-dev postgis postgresql-14-postgis-3
+sudo -u postgres psql -d civic_flow -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+```
+
+GeoDjango is included with Django, so no separate Python GIS package is
+required. The PostgreSQL connection is automatically upgraded to Django's
+PostGIS backend.
 
 Export the settings module and database URL, then run Django:
 

@@ -7,7 +7,10 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN addgroup --system civicflow \
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends gdal-bin libgdal-dev libgeos-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && addgroup --system civicflow \
     && adduser --system --ingroup civicflow civicflow
 
 COPY pyproject.toml README.md ./

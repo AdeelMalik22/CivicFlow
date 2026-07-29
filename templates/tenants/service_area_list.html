@@ -1,0 +1,112 @@
+{% extends "workspace/base.html" %}
+
+{% block title %}Service areas — CivicFlow{% endblock %}
+
+{% block workspace_content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Geographic configuration</p>
+      <h1>Service areas</h1>
+      <p>Map-supported boundaries used to validate and route infrastructure reports.</p>
+    </div>
+    <a class="button button-primary" href="{% url 'admin:tenants_servicearea_add' %}">
+      Add service area
+    </a>
+  </div>
+
+  <section class="directory-summary" aria-label="Service area summary">
+    <div>
+      <span>Service areas</span>
+      <strong>{{ service_areas|length }}</strong>
+    </div>
+    <div>
+      <span>Active</span>
+      <strong>{{ active_area_count }}</strong>
+    </div>
+    <div>
+      <span>Organizations covered</span>
+      <strong>{{ tenant_count }}</strong>
+    </div>
+  </section>
+
+  <section class="map-information-panel">
+    <span class="map-information-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
+    </span>
+    <div>
+      <strong>Spatial routing is active</strong>
+      <p>PostGIS can match a reported map location to the active boundary that contains it.</p>
+    </div>
+  </section>
+
+  <section class="data-panel" aria-labelledby="service-area-list-title">
+    <div class="data-panel-header">
+      <div>
+        <h2 id="service-area-list-title">Configured boundaries</h2>
+        <p>Boundaries are stored as WGS 84 multipolygons and remain isolated by organization.</p>
+      </div>
+    </div>
+
+    {% if service_areas %}
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Service area</th>
+              <th scope="col">Organization</th>
+              <th scope="col">Status</th>
+              <th scope="col">Regions</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for area in service_areas %}
+              <tr>
+                <td>
+                  <div class="entity-cell">
+                    <span class="entity-avatar entity-avatar-map" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
+                    </span>
+                    <div>
+                      <strong>{{ area.name }}</strong>
+                      <span>{{ area.code }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ area.tenant.name }}</td>
+                <td>
+                  {% if area.is_active %}
+                    <span class="table-status status-active">
+                      <span aria-hidden="true"></span>Active
+                    </span>
+                  {% else %}
+                    <span class="table-status status-suspended">
+                      <span aria-hidden="true"></span>Inactive
+                    </span>
+                  {% endif %}
+                </td>
+                <td>{{ area.boundary.num_geom }} polygon{{ area.boundary.num_geom|pluralize }}</td>
+                <td class="table-action">
+                  <a href="{% url 'admin:tenants_servicearea_change' area.pk %}">
+                    Manage<span class="sr-only"> {{ area.name }}</span>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-state-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Z"/></svg>
+        </span>
+        <h3>No service areas configured</h3>
+        <p>Add a boundary before accepting location-based reports for an organization.</p>
+        <a class="button button-primary" href="{% url 'admin:tenants_servicearea_add' %}">
+          Add first service area
+        </a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

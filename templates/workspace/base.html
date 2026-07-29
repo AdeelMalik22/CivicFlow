@@ -45,6 +45,16 @@
               </span>
               Organizations
             </a>
+            <a
+              class="workspace-nav-item{% if request.resolver_match.url_name == 'service-area-list' %} is-active{% endif %}"
+              href="{% url 'tenants:service-area-list' %}"
+              {% if request.resolver_match.url_name == 'service-area-list' %}aria-current="page"{% endif %}
+            >
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
+              </span>
+              Service areas
+            </a>
           {% endif %}
           <span class="workspace-nav-heading">Product modules</span>
           <span class="workspace-nav-item is-disabled" aria-disabled="true">
