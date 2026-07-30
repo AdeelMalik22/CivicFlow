@@ -67,6 +67,17 @@ a { color: var(--ds-brand); }
 .button-primary:hover { background: var(--ds-brand-dark); }
 .hero-actions .button-ghost { border: 1px solid var(--ds-line); background: var(--ds-surface); color: var(--ds-text); }
 .hero-actions .button-ghost:hover { border-color: var(--ds-brand); color: var(--ds-brand); background: var(--ds-surface); }
+.sign-in-section { min-height: calc(100vh - 72px); display: grid; place-items: center; padding: 4rem 1.25rem; background: radial-gradient(circle at 15% 10%, rgb(99 91 255 / 14%), transparent 35%), var(--ds-bg); }
+.sign-in-layout { width: min(100%, 68rem); grid-template-columns: minmax(0, 1fr) minmax(20rem, 28rem); gap: clamp(2rem, 7vw, 7rem); align-items: center; }
+.sign-in-context h1 { max-width: 9ch; font-size: clamp(2.5rem, 5vw, 4.75rem); letter-spacing: -.065em; line-height: .98; }
+.sign-in-context > p:not(.eyebrow) { max-width: 30rem; color: var(--ds-muted); font-size: 1.05rem; line-height: 1.65; }
+.auth-card { padding: clamp(1.5rem, 4vw, 2.5rem); }
+.auth-heading h2 { letter-spacing: -.04em; font-size: 1.75rem; }
+.auth-heading p { color: var(--ds-muted); line-height: 1.55; }
+.auth-form { gap: 1.1rem; }
+.auth-form label { color: var(--ds-text); font-weight: 650; }
+.auth-support { border-top: 1px solid var(--ds-line); margin-top: 1.5rem; padding-top: 1.25rem; color: var(--ds-muted); }
+.auth-support a { font-weight: 650; }
 .tracking-card, .auth-card, .citizen-form-card { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--ds-surface); box-shadow: var(--ds-shadow-sm); }
 .form-field input, .form-field select, .form-field textarea { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-surface); color: var(--ds-text); transition: border .16s ease, box-shadow .16s ease; }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--ds-brand); box-shadow: 0 0 0 4px rgb(99 91 255 / 14%); outline: none; }
