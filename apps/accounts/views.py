@@ -62,6 +62,9 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("profile")
     def get_object(self, queryset=None): return self.request.user
 
+class AccountSettingsView(LoginRequiredMixin, TemplateView):
+    template_name = "accounts/settings.html"
+
 
 class SignupVerifyView(View):
     template_name = "registration/signup_verify.html"

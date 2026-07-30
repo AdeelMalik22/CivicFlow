@@ -51,6 +51,7 @@ urlpatterns = [
         auth_views.LogoutView.as_view(next_page="home"),
         name="logout",
     ),
+    path("password-change/", auth_views.PasswordChangeView.as_view(template_name="registration/password_change.html"), name="password_change"),
     path("admin/", admin.site.urls),
     path("health/live/", liveness, name="health-live"),
     path("health/ready/", readiness, name="health-ready"),

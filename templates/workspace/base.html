@@ -135,7 +135,8 @@
               <span></span><span></span><span></span>
             </button>
           </div>
-          <div class="workspace-user">
+          <details class="workspace-user account-menu">
+            <summary>
             <span class="workspace-user-copy">
               <strong>{{ request.user.get_full_name|default:request.user.email }}</strong>
               <span>{% if request.user.is_staff %}Platform staff{% else %}Authenticated user{% endif %}</span>
@@ -143,7 +144,14 @@
             <span class="user-avatar" aria-hidden="true">
               {{ request.user.email|first|upper }}
             </span>
-          </div>
+            </summary>
+            <div class="account-menu-panel">
+              <a href="{% url 'profile' %}">Profile</a>
+              <a href="{% url 'settings' %}">Settings</a>
+              <a href="{% url 'issues:my_reports' %}">My reports</a>
+              <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
+            </div>
+          </details>
         </header>
 
         <main id="workspace-content" class="workspace-content">
