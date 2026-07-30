@@ -25,7 +25,7 @@ from .forms import (
     ProfileForm,
     TenantRoleForm,
 )
-from .models import SeparationOfDutiesPolicy, SignupOTP, StaffInvitation, TenantRole
+from .models import AccessPermission, SeparationOfDutiesPolicy, SignupOTP, StaffInvitation, TenantRole
 from .services import InvitationError, accept_staff_invitation
 
 
@@ -111,6 +111,7 @@ class TenantRoleListView(PlatformStaffRequiredMixin, ListView):
             "initiator_permission",
             "approver_permission",
         )
+        context["capabilities"] = AccessPermission.objects.order_by("name")
         return context
 
 
