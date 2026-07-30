@@ -7,6 +7,7 @@
     <meta name="description" content="CivicFlow secure workspace">
     <title>{% block title %}Workspace — CivicFlow{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/design-system.css' %}">
     {% block extra_head %}{% endblock %}
   </head>
   <body class="workspace-body">
@@ -127,7 +128,7 @@
         </div>
       </aside>
 
-      <div class="workspace-main">
+      <div class="workspace-main ds-workspace-main">
         <header class="workspace-header">
           <div>
             <button class="mobile-menu-button" type="button" aria-label="Open navigation" disabled>
