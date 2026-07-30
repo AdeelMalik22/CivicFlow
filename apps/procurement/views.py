@@ -56,3 +56,11 @@ class AwardCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         ProcurementAuditEvent.objects.create(tender=self.tender, actor=self.request.user, action="award_finalized", note=form.instance.decision_note)
         send_mail("Tender award notification", f"Your bid for {self.tender.reference} was selected.", None, [form.instance.winning_bid.contractor.email], fail_silently=True)
         return response
+
+class TenderAuditView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    template_name = "procurement/audit.html"
+    context_object_name = "events"
+    def test_func(self): return self.request.user.is_staff
+    def get_queryset(self):
+        tender = get_object_or_404(Tender, pk=self.kwargs["pk"])
+        return tender.audit_events.select_related("actor")
