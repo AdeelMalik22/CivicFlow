@@ -13,6 +13,9 @@ from apps.contractors.models import ContractorApplication
 class HomeView(TemplateView):
     template_name = "home.html"
 
+class HowItWorksView(TemplateView):
+    template_name = "how_it_works.html"
+
 
 class WorkspaceView(LoginRequiredMixin, TemplateView):
     """Authenticated starting point until role-specific modules are delivered."""
