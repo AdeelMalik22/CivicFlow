@@ -143,4 +143,26 @@
   </form>
 {% endblock %}
 
-{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}
+{% if form_variant == "service-area" %}<script>
+(function () {
+  function fallbackBoundary() {
+    var map = document.getElementById('id_boundary_map');
+    var field = document.getElementById('id_boundary');
+    if (!map || !field || window.ol) return;
+    map.classList.add('boundary-fallback');
+    map.innerHTML = '<div class="boundary-fallback-help">Click around the area to draw a boundary. Click the first point again to close it.</div><svg viewBox="0 0 100 60" role="img" aria-label="Boundary drawing area"></svg><button type="button" class="boundary-fallback-clear">Clear boundary</button>';
+    var svg = map.querySelector('svg'), points = [], polygon;
+    function redraw() {
+      if (polygon) polygon.remove();
+      polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      polygon.setAttribute('points', points.map(function (p) { return p.x + ',' + p.y; }).join(' '));
+      svg.appendChild(polygon);
+      field.value = points.length >= 3 ? 'MULTIPOLYGON (((' + points.map(function (p) { return (p.x / 100 * 2 - 1).toFixed(6) + ' ' + (1 - p.y / 60 * 2).toFixed(6); }).join(', ') + ', ' + ((points[0].x / 100 * 2 - 1).toFixed(6)) + ' ' + ((1 - points[0].y / 60 * 2).toFixed(6)) + ')))' : '';
+    }
+    svg.addEventListener('click', function (event) { var r = svg.getBoundingClientRect(); points.push({x: ((event.clientX-r.left)/r.width)*100, y: ((event.clientY-r.top)/r.height)*60}); redraw(); });
+    map.querySelector('.boundary-fallback-clear').onclick = function () { points = []; redraw(); };
+  }
+  window.setTimeout(fallbackBoundary, 800);
+}());
+</script>{% endif %}{% endblock %}

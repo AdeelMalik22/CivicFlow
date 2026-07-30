@@ -1155,7 +1155,21 @@ h3 {
 .form-card-map .dj_map {
   overflow: hidden;
   border: 1px solid var(--line);
+  min-height: 460px;
 }
+
+.form-card-map .form-field > .dj_map_wrapper,
+.form-card-map .form-field .dj_map_wrapper,
+.form-card-map .form-field .dj_map,
+.form-card-map .form-field [id$="_map"] {
+  min-height: 460px;
+}
+
+.boundary-fallback { position:relative; overflow:hidden; min-height:460px; background-color:#e8f0f5; background-image:linear-gradient(#cbd9df 1px,transparent 1px),linear-gradient(90deg,#cbd9df 1px,transparent 1px); background-size:40px 40px; }
+.boundary-fallback svg { display:block; width:100%; height:460px; cursor:crosshair; }
+.boundary-fallback polygon { fill:rgba(99,91,255,.28); stroke:#5148df; stroke-width:.7; }
+.boundary-fallback-help { position:absolute; z-index:2; top:14px; left:14px; padding:8px 12px; border-radius:8px; background:#fff; color:#132238; box-shadow:0 3px 12px rgba(16,24,40,.16); font-size:.82rem; font-weight:700; }
+.boundary-fallback-clear { position:absolute; z-index:2; right:14px; top:14px; border:0; border-radius:7px; padding:8px 12px; background:#fff; color:#b42318; cursor:pointer; font:inherit; font-size:.82rem; font-weight:700; }
 
 .form-field-map .dj_map_wrapper {
   width: 100%;

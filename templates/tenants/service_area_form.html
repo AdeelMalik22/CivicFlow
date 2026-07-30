@@ -5,4 +5,23 @@
 <section class="content"><div class="page-head"><div><a class="cf-back" href="{% url 'tenant-admin:dashboard' %}">← Administration</a><div class="eyebrow">Geographic administration</div><h1>{{ form_title }}</h1><p class="muted">Define ownership, public identity and the exact delivery boundary.</p></div><span class="status">{% if object %}Editing{% else %}Draft{% endif %}</span></div>
 <form method="post" class="editor" novalidate>{% csrf_token %}{% if form.non_field_errors %}<div class="cf-alert" role="alert">{{ form.non_field_errors }}</div>{% endif %}<section class="editor-form"><div class="form-group">{{ form.name.label_tag }}{{ form.name }}{{ form.name.errors }}</div><div class="form-group">{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div><div class="form-group">{{ form.tenant.label_tag }}{{ form.tenant }}{{ form.tenant.errors }}</div><div class="form-group">{{ form.code.label_tag }}{{ form.code }}{{ form.code.errors }}</div><div class="form-group">{{ form.is_active.label_tag }}{{ form.is_active }}{{ form.is_active.errors }}</div><div class="sticky-actions"><a class="btn btn-secondary" href="{% url 'tenant-admin:dashboard' %}">Discard</a><button class="btn btn-primary" type="submit">{{ submit_label }}</button></div></section><section class="editor-map"><div class="map-overlay"><div class="map-card"><strong>Boundary editor</strong><div class="muted">Draw the exact service area on the map</div></div><div class="map-card"><span class="status success">GIS boundary</span></div></div>{{ form.boundary }}{{ form.boundary.errors }}</section></form></section>
 {% endblock %}
-{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}<script>
+(function () {
+  function init() {
+    var map = document.getElementById('id_boundary_map'), field = document.getElementById('id_boundary');
+    if (!map || !field || window.ol) return;
+    map.classList.add('boundary-fallback');
+    map.innerHTML = '<div class="boundary-fallback-help">Click around the area to draw a boundary.</div><svg viewBox="0 0 100 60" role="img" aria-label="Boundary drawing area"></svg><button type="button" class="boundary-fallback-clear">Clear boundary</button>';
+    var svg = map.querySelector('svg'), points = [], polygon;
+    function redraw() {
+      if (polygon) polygon.remove();
+      polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      polygon.setAttribute('points', points.map(function (p) { return p.x + ',' + p.y; }).join(' ')); svg.appendChild(polygon);
+      field.value = points.length >= 3 ? 'MULTIPOLYGON (((' + points.map(function (p) { return (p.x / 100 * 2 - 1).toFixed(6) + ' ' + (1 - p.y / 60 * 2).toFixed(6); }).join(', ') + ', ' + ((points[0].x / 100 * 2 - 1).toFixed(6)) + ' ' + ((1 - points[0].y / 60 * 2).toFixed(6)) + ')))' : '';
+    }
+    svg.addEventListener('click', function (event) { var r = svg.getBoundingClientRect(); points.push({x: ((event.clientX-r.left)/r.width)*100, y: ((event.clientY-r.top)/r.height)*60}); redraw(); });
+    map.querySelector('.boundary-fallback-clear').onclick = function () { points = []; redraw(); };
+  }
+  window.setTimeout(init, 800);
+}());
+</script>{% endblock %}

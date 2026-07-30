@@ -10,7 +10,7 @@
 <body>
 <div class="workspace">
     <aside class="sidebar"><a class="brand" href="{% url 'workspace' %}"><span
-            class="brand-mark"></span><span>CivicFlow</span></a>
+            class="brand-mark">CF</span><span>CivicFlow</span></a>
         <div class="org-switch"><small>Organisation</small><br><span>{% if request.tenant %}
             {{ request.tenant.name }}{% else %}CivicFlow workspace{% endif %}</span></div>
         <nav class="side-nav"><a href="{% url 'workspace' %}"><span>Overview</span></a><a
