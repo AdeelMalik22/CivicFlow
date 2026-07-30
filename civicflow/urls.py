@@ -41,6 +41,8 @@ urlpatterns = [
         auth_views.LoginView.as_view(template_name="registration/login.html"),
         name="login",
     ),
+    path("sign-up/", include("apps.accounts.signup_urls")),
+    path("signup/", include("apps.accounts.signup_urls")),
     path(
         "sign-out/",
         auth_views.LogoutView.as_view(next_page="home"),

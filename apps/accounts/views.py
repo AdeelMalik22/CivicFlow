@@ -11,6 +11,7 @@ from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
 from .forms import (
+    CitizenRegistrationForm,
     InvitationSetPasswordForm,
     SeparationOfDutiesPolicyForm,
     TenantRoleForm,
@@ -24,6 +25,12 @@ class PlatformStaffRequiredMixin(UserPassesTestMixin):
 
     def test_func(self) -> bool:
         return self.request.user.is_authenticated and self.request.user.is_staff
+
+
+class CitizenRegistrationView(CreateView):
+    form_class = CitizenRegistrationForm
+    template_name = "registration/signup.html"
+    success_url = reverse_lazy("login")
 
 
 class TenantRoleListView(PlatformStaffRequiredMixin, ListView):

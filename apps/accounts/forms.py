@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import SetPasswordForm
 
 from .models import (
@@ -92,3 +93,37 @@ class InvitationSetPasswordForm(SetPasswordForm):
         strip=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
     )
+
+
+class CitizenRegistrationForm(forms.ModelForm):
+    password1 = forms.CharField(
+        label="Password", widget=forms.PasswordInput(attrs={"autocomplete": "new-password"})
+    )
+    password2 = forms.CharField(
+        label="Confirm password",
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ("first_name", "last_name", "email")
+        widgets = {"email": forms.EmailInput(attrs={"autocomplete": "email"})}
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].lower()
+        if get_user_model().objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account with this email already exists.")
+        return email
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("password1") != cleaned.get("password2"):
+            self.add_error("password2", "The passwords do not match.")
+        return cleaned
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
