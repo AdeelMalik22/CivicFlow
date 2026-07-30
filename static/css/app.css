@@ -764,6 +764,69 @@ h3 {
   opacity: 0.5;
 }
 
+.role-form-surface {
+  max-width: 68rem;
+}
+
+.role-form-surface .form-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.role-form-surface .form-card + .form-card {
+  border-top: 1px solid var(--line);
+}
+
+.role-form-errors {
+  margin: 1.5rem 2rem 0;
+}
+
+.permission-choice-grid > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.permission-choice-grid label {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: #f8fafc;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.permission-choice-grid label:has(input:checked) {
+  color: #174a91;
+  border-color: #9abce9;
+  background: #eef5ff;
+}
+
+.permission-choice-grid input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--brand);
+}
+
+.entity-avatar-role {
+  color: #5e3c99;
+  background: #eee7fb;
+}
+
+.policy-panel {
+  margin-top: 1.25rem;
+}
+
+.compact-empty-state {
+  padding-block: 2.5rem;
+}
+
 .form-card-heading {
   display: grid;
   grid-template-columns: 2.2rem minmax(0, 1fr);
@@ -2067,6 +2130,10 @@ h3 {
   .prerequisite-alert {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .permission-choice-grid > div {
+    grid-template-columns: 1fr;
   }
 }
 

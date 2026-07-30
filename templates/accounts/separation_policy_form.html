@@ -1,0 +1,31 @@
+{% extends "workspace/base.html" %}
+
+{% block title %}{% if object %}Edit policy{% else %}Add policy{% endif %} — CivicFlow{% endblock %}
+
+{% block workspace_content %}
+  <nav class="form-breadcrumb" aria-label="Breadcrumb"><a href="{% url 'accounts:role-list' %}"><span aria-hidden="true">←</span> Roles and permissions</a></nav>
+  <form method="post" class="entity-form" novalidate>
+    {% csrf_token %}
+    <div class="form-primary-surface role-form-surface">
+      <div class="page-header form-page-header">
+        <div><p class="eyebrow">Safety policy</p><h1>{% if object %}Edit policy{% else %}Add separation policy{% endif %}</h1><p>Prevent one person from initiating and approving the same controlled decision.</p></div>
+        <span class="form-mode-badge">{% if object %}Editing policy{% else %}New policy{% endif %}</span>
+      </div>
+      {% if form.non_field_errors %}<div class="form-errors role-form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+      <section class="form-card">
+        <div class="form-card-heading"><span class="form-step">01</span><div><h2>Policy definition</h2><p>Choose the organization and the two capabilities that must remain separated.</p></div></div>
+        <div class="form-grid form-grid-two">
+          {% include "tenants/includes/form_field.html" with field=form.tenant %}
+          {% include "tenants/includes/form_field.html" with field=form.name %}
+          {% include "tenants/includes/form_field.html" with field=form.initiator_permission %}
+          {% include "tenants/includes/form_field.html" with field=form.approver_permission %}
+          <div class="form-grid-span">{% include "tenants/includes/form_field.html" with field=form.is_active %}</div>
+        </div>
+      </section>
+      <div class="form-action-bar">
+        <p><strong>{% if object %}Update{% else %}Create{% endif %} policy</strong><span>Active policies are enforced by server-side workflow checks.</span></p>
+        <div><a class="button button-secondary" href="{% url 'accounts:role-list' %}">Cancel</a><button class="button button-primary" type="submit">{% if object %}Save changes{% else %}Add policy{% endif %}</button></div>
+      </div>
+    </div>
+  </form>
+{% endblock %}

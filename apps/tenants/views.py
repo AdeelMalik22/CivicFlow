@@ -87,6 +87,7 @@ class EntityFormMixin(StaffRequiredMixin):
     success_message = "Saved successfully."
 
     def form_valid(self, form):
+        form.assigned_by = self.request.user
         response = super().form_valid(form)
         messages.success(self.request, self.success_message)
         return response

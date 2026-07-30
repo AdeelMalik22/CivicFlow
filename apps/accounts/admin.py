@@ -1,7 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from .models import User
+from .models import (
+    AccessPermission,
+    MembershipRole,
+    RolePermission,
+    SeparationOfDutiesPolicy,
+    TenantRole,
+    User,
+)
 
 
 @admin.register(User)
@@ -28,6 +35,39 @@ class UserAdmin(DjangoUserAdmin):
         ),
         ("System", {"fields": ("public_id", "last_login", "date_joined")}),
     )
+
+
+class RolePermissionInline(admin.TabularInline):
+    model = RolePermission
+    extra = 0
+
+
+@admin.register(TenantRole)
+class TenantRoleAdmin(admin.ModelAdmin):
+    list_display = ("name", "tenant", "code", "requires_mfa", "is_active")
+    list_filter = ("tenant", "requires_mfa", "is_active")
+    search_fields = ("name", "code", "tenant__name")
+    inlines = (RolePermissionInline,)
+
+
+@admin.register(AccessPermission)
+class AccessPermissionAdmin(admin.ModelAdmin):
+    list_display = ("name", "code", "default_scope", "is_sensitive")
+    list_filter = ("default_scope", "is_sensitive")
+    search_fields = ("name", "code")
+
+
+@admin.register(MembershipRole)
+class MembershipRoleAdmin(admin.ModelAdmin):
+    list_display = ("membership", "role", "assigned_by", "assigned_at")
+    list_filter = ("role__tenant", "role")
+    autocomplete_fields = ("membership", "role", "assigned_by")
+
+
+@admin.register(SeparationOfDutiesPolicy)
+class SeparationOfDutiesPolicyAdmin(admin.ModelAdmin):
+    list_display = ("name", "tenant", "initiator_permission", "approver_permission", "is_active")
+    list_filter = ("tenant", "is_active")
     add_fieldsets = (
         (
             None,

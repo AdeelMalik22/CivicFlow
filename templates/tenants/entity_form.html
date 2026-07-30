@@ -96,6 +96,12 @@
               </div>
               {% include "tenants/includes/form_field.html" with field=form.tenant %}
               {% include "tenants/includes/form_field.html" with field=form.status %}
+              <div class="form-field">
+                <div class="label-row">{{ form.roles.label_tag }}<span>Optional</span></div>
+                <div class="permission-choice-grid">{{ form.roles }}</div>
+                {% if form.roles.help_text %}<p class="field-help">{{ form.roles.help_text }}</p>{% endif %}
+                {% if form.roles.errors %}<div class="field-errors" role="alert">{{ form.roles.errors }}</div>{% endif %}
+              </div>
             </div>
           </section>
           {% endif %}

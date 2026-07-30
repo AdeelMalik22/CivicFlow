@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.gis.forms import OSMWidget
 
+from apps.accounts.models import MembershipRole, TenantRole
+
 from .models import ServiceArea, Tenant, TenantMembership
 
 User = get_user_model()
@@ -64,6 +66,12 @@ class ServiceAreaForm(forms.ModelForm):
 
 
 class TenantMembershipForm(forms.ModelForm):
+    roles = forms.ModelMultipleChoiceField(
+        queryset=TenantRole.objects.none(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        help_text="Assign one or more tenant-scoped roles.",
+    )
     email = forms.EmailField(
         label="Email address",
         widget=forms.EmailInput(
@@ -108,6 +116,17 @@ class TenantMembershipForm(forms.ModelForm):
             self.fields["first_name"].initial = self.instance.user.first_name
             self.fields["last_name"].initial = self.instance.user.last_name
             self.fields["email"].disabled = True
+
+        tenant_id = self.instance.tenant_id if self.instance.pk else self.data.get("tenant")
+        if tenant_id:
+            self.fields["roles"].queryset = TenantRole.objects.filter(
+                tenant_id=tenant_id,
+                is_active=True,
+            )
+        if self.instance.pk:
+            self.fields["roles"].initial = TenantRole.objects.filter(
+                membership_assignments__membership=self.instance
+            )
 
     def clean_email(self) -> str:
         email = self.cleaned_data["email"].strip().lower()
@@ -155,5 +174,15 @@ class TenantMembershipForm(forms.ModelForm):
 
         if commit:
             membership.save()
+            selected_roles = self.cleaned_data["roles"]
+            MembershipRole.objects.filter(membership=membership).exclude(
+                role__in=selected_roles
+            ).delete()
+            for role in selected_roles:
+                MembershipRole.objects.get_or_create(
+                    membership=membership,
+                    role=role,
+                    defaults={"assigned_by": getattr(self, "assigned_by", None)},
+                )
             self.save_m2m()
         return membership

@@ -66,6 +66,16 @@
               </span>
               Memberships
             </a>
+            <a
+              class="workspace-nav-item{% if request.resolver_match.namespace == 'accounts' %} is-active{% endif %}"
+              href="{% url 'accounts:role-list' %}"
+              {% if request.resolver_match.namespace == 'accounts' %}aria-current="page"{% endif %}
+            >
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm0 3 5 1.9V11c0 3.5-2.1 7-5 8.2C9.1 18 7 14.5 7 11V6.9L12 5Z"/></svg>
+              </span>
+              Roles &amp; policies
+            </a>
           {% endif %}
           <span class="workspace-nav-heading">Product modules</span>
           <span class="workspace-nav-item is-disabled" aria-disabled="true">
