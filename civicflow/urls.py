@@ -20,7 +20,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from apps.common.views import AccountabilityView, HomeView, HowItWorksView, WorkspaceView, liveness, readiness
+from apps.common.views import AccountabilityView, HomeView, HowItWorksView, ProjectsView, WorkspaceView, liveness, readiness
 
 admin.site.site_header = "CivicFlow administration"
 admin.site.site_title = "CivicFlow admin"
@@ -31,6 +31,7 @@ urlpatterns = [
     path("how-it-works/", HowItWorksView.as_view(), name="how-it-works"),
     path("accountability/", AccountabilityView.as_view(), name="accountability"),
     path("workspace/", WorkspaceView.as_view(), name="workspace"),
+    path("workspace/projects/", ProjectsView.as_view(), name="projects"),
     path(
         "workspace/organizations/",
         include("apps.tenants.urls"),

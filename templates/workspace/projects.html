@@ -1,0 +1,11 @@
+{% extends "workspace/base.html" %}
+{% block title %}Projects — CivicFlow{% endblock %}
+{% block workspace_content %}
+<section class="content">
+  <div class="page-head"><div><div class="eyebrow">Capital delivery</div><h1>Projects</h1><p class="muted">Track funded infrastructure from commitment to completion.</p></div><button class="btn btn-primary" type="button">Create project</button></div>
+  <div class="section-grid">
+    <div class="panel"><div class="eyebrow">Portfolio health</div><h2 style="font-size:54px">82% on track</h2><p class="muted">21 active projects across six service areas.</p><div class="kpi-strip" style="grid-template-columns:1fr 1fr;margin-top:24px"><div class="kpi"><span class="muted">Committed</span><strong>£18.4m</strong></div><div class="kpi"><span class="muted">Delivered</span><strong>£11.2m</strong></div></div></div>
+    <div class="panel"><h3>Delivery sequence</h3><div class="timeline"><div class="event"><span class="line-dot"></span><div><strong>North Canal rehabilitation</strong><div class="muted">Construction • 68% complete</div></div><span class="status success">On track</span></div><div class="event"><span class="line-dot"></span><div><strong>Ward 7 street renewal</strong><div class="muted">Procurement • bids under review</div></div><span class="status warning">Attention</span></div><div class="event"><span class="line-dot"></span><div><strong>Central market drainage</strong><div class="muted">Planning • design approval</div></div><span class="status">Planning</span></div></div></div>
+  </div>
+</section>
+{% endblock %}

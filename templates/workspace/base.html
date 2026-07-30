@@ -14,7 +14,7 @@
             {{ request.tenant.name }}{% else %}CivicFlow workspace{% endif %}</span></div>
         <nav class="side-nav"><a href="{% url 'workspace' %}"><span>Overview</span></a><a
                 href="{% url 'issues:my_reports' %}"><span>Reports</span></a><a
-                href="{% url 'procurement:tenders' %}"><span>Projects</span></a><a
+                href="{% url 'projects' %}"><span>Projects</span></a><a
                 href="{% url 'procurement:tenders' %}"><span>Procurement</span></a>{% if request.user.is_staff %}
             <a href="{% url 'tenants:list' %}"><span>Organizations</span></a>
             <a href="{% url 'tenants:service-area-list' %}"><span>Service areas</span></a>
