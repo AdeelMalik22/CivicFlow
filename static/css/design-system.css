@@ -29,6 +29,15 @@ body { background: var(--ds-bg); color: var(--ds-text); font-family: var(--ds-fo
 .workspace-sidebar { border-right: 1px solid var(--ds-line); background: var(--ds-surface); }
 .workspace-nav-item { border-radius: var(--ds-radius-sm); color: var(--ds-muted); font-weight: 600; }
 .workspace-nav-item:hover, .workspace-nav-item.is-active { background: var(--ds-surface-subtle); color: var(--ds-text); }
+.hero { padding: 7rem 0 6rem; background: radial-gradient(circle at 75% 20%, rgb(99 91 255 / 12%), transparent 34%), var(--ds-bg); }
+.hero-copy h1 { max-width: 11ch; font-size: clamp(3rem, 7vw, 6.5rem); line-height: .96; letter-spacing: -.07em; }
+.hero-summary { max-width: 38rem; color: var(--ds-muted); font-size: 1.15rem; line-height: 1.7; }
+.status-card, .feature-card, .action-card { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--ds-surface); box-shadow: var(--ds-shadow-lg); }
+.status-card { padding: 2rem; }
+.section { padding: 6rem 0; }
+.section-heading h2, .accountability-grid h2 { letter-spacing: -.045em; font-size: clamp(2rem, 4vw, 3.5rem); }
+.feature-card, .action-card { padding: 1.75rem; transition: transform .2s ease, box-shadow .2s ease; }
+.feature-card:hover, .action-card:hover { transform: translateY(-4px); box-shadow: var(--ds-shadow-lg); }
 a { color: var(--ds-brand); }
 .button { border-radius: var(--ds-radius-sm); font-weight: 650; box-shadow: none; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
 .button:hover { transform: translateY(-1px); box-shadow: var(--ds-shadow-sm); }
