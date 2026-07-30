@@ -40,4 +40,7 @@ class Command(BaseCommand):
             tender, _ = Tender.objects.get_or_create(reference=f"TN-DEMO-{i+1:03d}", defaults={"title": f"Northbridge works package {i+1}", "description": "Demo procurement opportunity for public infrastructure delivery.", "published": True, "deadline": timezone.now() + timedelta(days=7 + i), "created_by": admin})
             for user in users[1:6]:
                 Bid.objects.get_or_create(tender=tender, contractor=user, defaults={"amount": Decimal(10000 + i * 500), "proposal": "Demo bid proposal", "document": "demo/bid.pdf"})
+            ProcurementAuditEvent.objects.get_or_create(tender=tender, actor=admin, action="published", defaults={"note": "Tender published for demonstration data."})
+        for i, user in enumerate(users[1:6], start=1):
+            ContractorApplication.objects.get_or_create(applicant=user, registration_number=f"REG-DEMO-{i:03d}", defaults={"company_name": f"{user.first_name} Civil Works", "contact_person": user.get_full_name() or user.email, "phone": f"0300-555{i:04d}", "cnic_ntn": f"42101-{i:05d}-1", "category": "Road repair", "years_experience": 5 + i, "registration_document": "demo/registration.pdf", "tax_document": "demo/tax.pdf", "cnic_document": "demo/cnic.pdf", "status": ContractorApplication.Status.APPROVED})
         self.stdout.write(self.style.SUCCESS("Seeded demo users, tenant data, 100 reports, tenders, and bids. Password: DemoPass123!"))

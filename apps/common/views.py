@@ -38,6 +38,9 @@ class WorkspaceView(LoginRequiredMixin, TemplateView):
         context["active_tenders_count"] = Tender.objects.filter(published=True).count()
         context["pending_bids_count"] = Bid.objects.filter(tender__published=True).count()
         context["active_contractors_count"] = ContractorApplication.objects.filter(status=ContractorApplication.Status.APPROVED).count()
+        context["recent_reports"] = Issue.objects.filter(tenant=tenant).order_by("-created_at")[:3] if tenant else Issue.objects.none()
+        context["recent_tenders"] = Tender.objects.order_by("-created_at")[:3]
+        context["recent_contractors"] = ContractorApplication.objects.order_by("-created_at")[:3]
         return context
 
 
