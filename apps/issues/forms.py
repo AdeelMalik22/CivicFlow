@@ -80,6 +80,7 @@ class IssueReportForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs) -> None:
         user = kwargs.pop("user", None)
+        self.user = user
         super().__init__(*args, **kwargs)
         self.fields["service_area"].queryset = ServiceArea.objects.active().select_related("tenant")
         if user is not None and getattr(user, "is_authenticated", False):
@@ -87,6 +88,10 @@ class IssueReportForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        if self.user is not None and not self.user.email_verified:
+            self.add_error(None, "Verify your email address before submitting a report.")
+        if self.user is not None and not self.user.cnic:
+            self.add_error(None, "Add your CNIC to your account before submitting a report.")
         wants_email = cleaned_data.get("contact_preference") == Issue.ContactPreference.EMAIL
         if wants_email and not cleaned_data.get("contact_email"):
             self.add_error("contact_email", "Enter an email address to receive updates.")

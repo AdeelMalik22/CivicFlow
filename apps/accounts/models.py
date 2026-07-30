@@ -17,6 +17,10 @@ class User(AbstractUser):
     username = None
     public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     email = models.EmailField("email address", unique=True)
+    phone_number = models.CharField(max_length=32, blank=True)
+    cnic = models.CharField(max_length=32, blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    email_verified = models.BooleanField(default=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: list[str] = []

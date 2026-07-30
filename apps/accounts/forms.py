@@ -106,7 +106,7 @@ class CitizenRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ("first_name", "last_name", "email")
+        fields = ("first_name", "last_name", "email", "phone_number", "cnic", "address")
         widgets = {"email": forms.EmailInput(attrs={"autocomplete": "email"})}
 
     def clean_email(self):
@@ -124,6 +124,7 @@ class CitizenRegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
+        user.email_verified = False
         if commit:
             user.save()
         return user
