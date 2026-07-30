@@ -31,3 +31,13 @@ class Award(models.Model):
     awarded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     decision_note = models.TextField(blank=True)
     awarded_at = models.DateTimeField(auto_now_add=True)
+
+
+class ProcurementAuditEvent(models.Model):
+    tender = models.ForeignKey(Tender, on_delete=models.CASCADE, related_name="audit_events")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    action = models.CharField(max_length=64)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering = ("-created_at",)

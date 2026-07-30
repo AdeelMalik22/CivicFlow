@@ -3,8 +3,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import CreateView, ListView
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.core.mail import send_mail
 from .forms import TenderForm, BidForm, AwardForm
-from .models import Tender, Bid, Award
+from .models import Tender, Bid, Award, ProcurementAuditEvent
 from apps.contractors.access import can_submit_bids
 
 class TenderListView(ListView):
@@ -51,4 +52,7 @@ class AwardCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         form.instance.awarded_by = self.request.user
         self.tender.published = False
         self.tender.save(update_fields=("published",))
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        ProcurementAuditEvent.objects.create(tender=self.tender, actor=self.request.user, action="award_finalized", note=form.instance.decision_note)
+        send_mail("Tender award notification", f"Your bid for {self.tender.reference} was selected.", None, [form.instance.winning_bid.contractor.email], fail_silently=True)
+        return response
