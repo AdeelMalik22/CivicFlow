@@ -65,6 +65,8 @@ a { color: var(--ds-brand); }
 .button:hover { transform: translateY(-1px); box-shadow: var(--ds-shadow-sm); }
 .button-primary { background: var(--ds-brand); }
 .button-primary:hover { background: var(--ds-brand-dark); }
+.hero-actions .button-ghost { border: 1px solid var(--ds-line); background: var(--ds-surface); color: var(--ds-text); }
+.hero-actions .button-ghost:hover { border-color: var(--ds-brand); color: var(--ds-brand); background: var(--ds-surface); }
 .tracking-card, .auth-card, .citizen-form-card { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--ds-surface); box-shadow: var(--ds-shadow-sm); }
 .form-field input, .form-field select, .form-field textarea { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-surface); color: var(--ds-text); transition: border .16s ease, box-shadow .16s ease; }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--ds-brand); box-shadow: 0 0 0 4px rgb(99 91 255 / 14%); outline: none; }
