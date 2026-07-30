@@ -2,20 +2,24 @@
 {% block title %}Report an issue — CivicFlow{% endblock %}
 {% block extra_head %}{{ form.media.css }}{% endblock %}
 {% block content %}
-  <section class="citizen-form-section"><div class="container citizen-form-layout">
-    <div class="citizen-form-main">
-      <div class="report-progress" aria-label="Report progress"><span class="is-active">1 <small>Issue</small></span><i></i><span>2 <small>Location</small></span><i></i><span>3 <small>Evidence</small></span><i></i><span>4 <small>Contact</small></span></div>
-      <p class="eyebrow">Citizen reporting</p><h1>Report an infrastructure issue</h1><p class="citizen-form-intro">Tell the responsible public team what needs attention. It takes a few minutes.</p>
-      <form method="post" enctype="multipart/form-data" class="citizen-report-form" novalidate>{% csrf_token %}
-        {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
-        <section class="citizen-form-card"><div class="citizen-form-card-heading"><span>01</span><div><h2>What happened?</h2><p>Give the public team enough context to understand the issue.</p></div></div>{% include "issues/includes/field.html" with field=form.category %}{% include "issues/includes/field.html" with field=form.description %}</section>
-        <section class="citizen-form-card"><div class="citizen-form-card-heading"><span>02</span><div><h2>Where is it?</h2><p>We use the location to route your report to the right organization.</p></div></div>{% include "issues/includes/field.html" with field=form.service_area %}{% include "issues/includes/field.html" with field=form.location %}</section>
-        <section class="citizen-form-card"><div class="citizen-form-card-heading"><span>03</span><div><h2>Add evidence</h2><p>Photos help the responsible team understand the issue.</p></div></div>{% include "issues/includes/field.html" with field=form.attachments %}</section>
-        <section class="citizen-form-card"><div class="citizen-form-card-heading"><span>04</span><div><h2>Stay informed</h2><p>Contact details stay private and are never shown on the public timeline.</p></div></div><div class="citizen-form-grid">{% include "issues/includes/field.html" with field=form.contact_preference %}{% include "issues/includes/field.html" with field=form.contact_email %}</div></section>
-        <div class="citizen-form-actions"><a class="button button-secondary" href="{% url 'home' %}">Cancel</a><button class="button button-primary" type="submit">Submit report</button></div>
-      </form>
-    </div>
-    <aside class="citizen-form-aside"><div class="citizen-aside-icon">i</div><h2>What happens next?</h2><ol><li><strong>We record your report</strong><span>You receive a reference and private verification code.</span></li><li><strong>A public team reviews it</strong><span>The location routes it to the responsible organization.</span></li><li><strong>You can follow progress</strong><span>Use your reference and code to see safe status updates.</span></li></ol></aside>
-  </div></section>
+<section class="section report-page" style="padding-top:54px">
+  <div class="page-head"><div><div class="eyebrow">Citizen reporting</div><h1>Tell us what needs attention</h1><p class="muted">You can save progress and return later.</p></div><span class="status">Step 1 of 4</span></div>
+  <div class="guided">
+    <form method="post" enctype="multipart/form-data" class="panel" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="steps"><span class="step active"></span><span class="step"></span><span class="step"></span><span class="step"></span></div>
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+          {% if field.help_text %}<span class="help">{{ field.help_text }}</span>{% endif %}
+          {% for error in field.errors %}<span class="help" style="color:var(--danger)">{{ error }}</span>{% endfor %}
+        </div>
+      {% endfor %}
+      <div class="actions" style="justify-content:flex-end"><button class="btn btn-primary" type="submit">Submit report</button></div>
+    </form>
+    <aside class="guide"><div class="eyebrow" style="color:#A7A2FF">Helpful context</div><h3>What makes a useful report?</h3><p class="muted">Describe the physical problem, how long it has existed and how it affects people. Photos can be added with your report.</p><div class="map-card" style="margin-top:24px;color:#101828"><strong>Private by default</strong><p class="muted">Your contact information is never shown publicly.</p></div></aside>
+  </div>
+</section>
 {% endblock %}
 {% block extra_scripts %}{{ form.media.js }}{% endblock %}
