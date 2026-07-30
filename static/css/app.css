@@ -2619,6 +2619,7 @@ h3 {
 .error-content h1 {
   max-width: 16ch;
   margin-inline: auto;
+  color: var(--ink);
   font-size: clamp(2rem, 5vw, 3.5rem);
 }
 
