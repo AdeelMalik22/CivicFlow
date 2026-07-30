@@ -137,3 +137,14 @@ button{cursor:pointer}
  body,.topbar,.public-nav{background:var(--bg);color:var(--ink)}.panel,.kpi-strip,.kpi,.feed-row,.editor-form,.field,.select,.textarea,.quick,.matrix,.process article,.trust-strip,.trust-item{background:var(--surface)}
  .map-card{background:rgba(17,24,39,.9)}.matrix th{background:#151D2B}.dropzone{background:#121A28}.empty{background:rgba(17,24,39,.5)}
 }
+.hero .btn-secondary{color:var(--ink);background:var(--surface)}
+.account-menu-panel{color:var(--ink);background:var(--surface);border:1px solid var(--line)}
+.account-menu-panel a,.account-menu-panel button{color:var(--ink)}
+.account-menu-panel a:hover,.account-menu-panel button:hover{color:var(--ink);background:var(--surface2)}
+.public-nav .nav-links{margin-left:auto}
+.public-nav .header-inner{width:100%;display:flex;align-items:center;gap:24px}
+.public-nav .header-inner .nav-links{margin-left:auto;justify-content:flex-end}
+.public-nav .account-menu{margin-left:.5rem}
+.public-nav .account-menu > summary{background:var(--brand)!important;color:#fff!important;border-radius:50%;width:36px;height:36px;display:grid;place-items:center;list-style:none;cursor:pointer}
+.public-nav .account-menu > summary::-webkit-details-marker{display:none}
+.public-nav .account-menu{margin-right:0!important}
