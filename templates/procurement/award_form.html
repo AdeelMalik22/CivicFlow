@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block content %}<section class="tracking-section"><div class="container"><h1>Award tender</h1><form method="post" class="auth-form">{% csrf_token %}{{ form.as_p }}<button class="button button-primary">Finalize award</button></form></div></section>{% endblock %}

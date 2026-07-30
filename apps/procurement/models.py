@@ -23,3 +23,11 @@ class Bid(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         constraints = [models.UniqueConstraint(fields=("tender", "contractor"), name="one_bid_per_tender")]
+
+
+class Award(models.Model):
+    tender = models.OneToOneField(Tender, on_delete=models.PROTECT, related_name="award")
+    winning_bid = models.OneToOneField(Bid, on_delete=models.PROTECT, related_name="award")
+    awarded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    decision_note = models.TextField(blank=True)
+    awarded_at = models.DateTimeField(auto_now_add=True)

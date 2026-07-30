@@ -1,5 +1,5 @@
 from django import forms
-from .models import Tender, Bid
+from .models import Tender, Bid, Award
 class TenderForm(forms.ModelForm):
     class Meta:
         model = Tender
@@ -9,3 +9,8 @@ class BidForm(forms.ModelForm):
     class Meta:
         model = Bid
         fields = ("amount", "proposal", "document")
+
+class AwardForm(forms.ModelForm):
+    class Meta:
+        model = Award
+        fields = ("winning_bid", "decision_note")

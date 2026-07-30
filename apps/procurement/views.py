@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import CreateView, ListView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .forms import TenderForm, BidForm
-from .models import Tender, Bid
+from .forms import TenderForm, BidForm, AwardForm
+from .models import Tender, Bid, Award
 from apps.contractors.access import can_submit_bids
 
 class TenderListView(ListView):
@@ -32,3 +32,23 @@ class BidCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.tender = self.tender; form.instance.contractor = self.request.user
         response = super().form_valid(form); return redirect("procurement:tenders")
+
+class AwardCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    form_class = AwardForm
+    template_name = "procurement/award_form.html"
+    def test_func(self): return self.request.user.is_staff
+    def dispatch(self, request, *args, **kwargs):
+        self.tender = get_object_or_404(Tender, pk=kwargs["pk"])
+        if hasattr(self.tender, "award"):
+            return redirect("procurement:tenders")
+        return super().dispatch(request, *args, **kwargs)
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["winning_bid"].queryset = Bid.objects.filter(tender=self.tender).select_related("contractor")
+        return form
+    def form_valid(self, form):
+        form.instance.tender = self.tender
+        form.instance.awarded_by = self.request.user
+        self.tender.published = False
+        self.tender.save(update_fields=("published",))
+        return super().form_valid(form)
