@@ -16,6 +16,9 @@ class HomeView(TemplateView):
 class HowItWorksView(TemplateView):
     template_name = "how_it_works.html"
 
+class AccountabilityView(TemplateView):
+    template_name = "accountability.html"
+
 
 class WorkspaceView(LoginRequiredMixin, TemplateView):
     """Authenticated starting point until role-specific modules are delivered."""
