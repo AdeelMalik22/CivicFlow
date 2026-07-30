@@ -125,6 +125,11 @@ class CitizenRegistrationForm(forms.ModelForm):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         user.email_verified = False
+        user.is_active = False
         if commit:
             user.save()
         return user
+
+
+class SignupOTPForm(forms.Form):
+    code = forms.CharField(min_length=6, max_length=6, label="Verification code")

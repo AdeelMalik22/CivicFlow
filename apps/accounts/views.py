@@ -1,10 +1,17 @@
+import hashlib
+import secrets
+from datetime import timedelta
+
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.db.models import Count, Q, QuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.views import View
@@ -14,9 +21,10 @@ from .forms import (
     CitizenRegistrationForm,
     InvitationSetPasswordForm,
     SeparationOfDutiesPolicyForm,
+    SignupOTPForm,
     TenantRoleForm,
 )
-from .models import SeparationOfDutiesPolicy, StaffInvitation, TenantRole
+from .models import SeparationOfDutiesPolicy, SignupOTP, StaffInvitation, TenantRole
 from .services import InvitationError, accept_staff_invitation
 
 
@@ -30,7 +38,40 @@ class PlatformStaffRequiredMixin(UserPassesTestMixin):
 class CitizenRegistrationView(CreateView):
     form_class = CitizenRegistrationForm
     template_name = "registration/signup.html"
-    success_url = reverse_lazy("login")
+    def form_valid(self, form):
+        super().form_valid(form)
+        code = f"{secrets.randbelow(1000000):06d}"
+        SignupOTP.objects.create(
+            user=self.object,
+            code_hash=hashlib.sha256(code.encode()).hexdigest(),
+            expires_at=timezone.now() + timedelta(minutes=10),
+        )
+        send_mail(
+            "CivicFlow verification code",
+            f"Your verification code is {code}.",
+            None,
+            [self.object.email],
+        )
+        return redirect("signup-verify", user_id=self.object.pk)
+
+
+class SignupVerifyView(View):
+    template_name = "registration/signup_verify.html"
+
+    def get(self, request, user_id):
+        return render(request, self.template_name, {"form": SignupOTPForm()})
+
+    def post(self, request, user_id):
+        form = SignupOTPForm(request.POST)
+        user = get_object_or_404(get_user_model(), pk=user_id, is_active=False)
+        otp = SignupOTP.objects.filter(user=user).order_by("-created_at").first()
+        if form.is_valid() and otp and otp.verify_code(form.cleaned_data["code"]):
+            user.is_active = True
+            user.email_verified = True
+            user.save(update_fields=("is_active", "email_verified"))
+            return redirect("login")
+        form.add_error("code", "The code is invalid, expired, or locked.")
+        return render(request, self.template_name, {"form": form})
 
 
 class TenantRoleListView(PlatformStaffRequiredMixin, ListView):

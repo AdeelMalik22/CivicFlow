@@ -1,3 +1,4 @@
+import hashlib
 import uuid
 
 from django.conf import settings
@@ -5,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.functions import Lower
+from django.utils import timezone
 
 from apps.tenants.scoping import TenantScopedQuerySet
 
@@ -29,6 +31,23 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.get_full_name() or self.email
+
+
+class SignupOTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="signup_otps")
+    code_hash = models.CharField(max_length=64)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Signup OTP for {self.user.email}"
+
+    def verify_code(self, code: str) -> bool:
+        self.attempts += 1
+        self.save(update_fields=("attempts",))
+        digest = hashlib.sha256(code.encode()).hexdigest()
+        return self.attempts <= 5 and self.expires_at > timezone.now() and digest == self.code_hash
 
 
 class AccessPermission(models.Model):
