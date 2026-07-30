@@ -1,13 +1,14 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import CreateView, ListView
 
 from .forms import ContractorApplicationForm, ContractorReviewForm
 from .models import ContractorApplication
+from .access import can_submit_bids
 
 
 class ContractorApplyView(LoginRequiredMixin, CreateView):
@@ -45,3 +46,10 @@ class ContractorReviewView(LoginRequiredMixin, UserPassesTestMixin, View):
             application.save(update_fields=("status", "review_reason", "reviewed_by", "updated_at"))
             messages.success(request, "Contractor application updated.")
         return redirect("contractors:review")
+
+class ContractorBiddingView(LoginRequiredMixin, View):
+    def get(self, request):
+        if not can_submit_bids(request.user):
+            messages.error(request, "Bidding access is available only after contractor approval.")
+            return redirect("contractors:mine")
+        return render(request, "contractors/bidding.html")
