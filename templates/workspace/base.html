@@ -98,25 +98,24 @@
             </a>
           {% endif %}
           <span class="workspace-nav-heading">Product modules</span>
-          <span class="workspace-nav-item is-disabled" aria-disabled="true">
+          <a class="workspace-nav-item" href="{% url 'issues:my_reports' %}">
             <span class="nav-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm3 4v2h10V8H7Zm0 4v2h7v-2H7Z"/></svg>
             </span>
             Reports
-            <span class="nav-tag">Next</span>
-          </span>
-          <span class="workspace-nav-item is-disabled" aria-disabled="true">
+          </a>
+          <a class="workspace-nav-item" href="{% url 'procurement:tenders' %}">
             <span class="nav-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3V6Z"/></svg>
             </span>
             Projects
-          </span>
-          <span class="workspace-nav-item is-disabled" aria-disabled="true">
+          </a>
+          <a class="workspace-nav-item" href="{% url 'procurement:tenders' %}">
             <span class="nav-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5V4Zm3 4v2h8V8H8Zm0 4v2h8v-2H8Z"/></svg>
             </span>
             Procurement
-          </span>
+          </a>
         </nav>
 
         <div class="workspace-sidebar-footer">
