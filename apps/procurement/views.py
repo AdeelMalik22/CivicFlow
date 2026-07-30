@@ -26,7 +26,8 @@ class BidCreateView(LoginRequiredMixin, CreateView):
     template_name = "procurement/bid_form.html"
     def dispatch(self, request, *args, **kwargs):
         self.tender = get_object_or_404(Tender, pk=kwargs["pk"], published=True)
-        if not can_submit_bids(request.user) or not self.tender.open_for_bids:
+        already_bid = Bid.objects.filter(tender=self.tender, contractor=request.user).exists()
+        if not can_submit_bids(request.user) or not self.tender.open_for_bids or already_bid:
             messages.error(request, "You are not eligible to bid on this tender.")
             return redirect("procurement:tenders")
         return super().dispatch(request, *args, **kwargs)
