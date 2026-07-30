@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block content %}<section class="tracking-section"><div class="container"><h1>Submit bid</h1><form method="post" enctype="multipart/form-data" class="auth-form">{% csrf_token %}{{ form.as_p }}<button class="button button-primary">Submit bid</button></form></div></section>{% endblock %}
