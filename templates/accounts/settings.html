@@ -1,29 +1,16 @@
-{% extends "workspace/base.html" %}{% block title %}Account settings — CivicFlow{% endblock %}
+{% extends "workspace/base.html" %}
+{% block title %}Account settings — CivicFlow{% endblock %}
 {% block workspace_content %}
-    <section class="content">
-        <div class="page-head">
-            <div>
-                <div class="eyebrow">Personal workspace</div>
-                <h1>Account settings</h1>
-                <p class="muted">Manage security, notifications and organisation preferences.</p></div>
-            <a class="btn btn-primary" href="{% url 'profile' %}">Save changes</a></div>
-        <div class="settings-layout">
-            <nav class="settings-nav"><a class="active" href="#account">Account</a><a href="#security">Security</a><a
-                    href="#notifications">Notifications</a><a href="#organization">Organisation preferences</a></nav>
-            <div class="panel" id="account"><h3>Account profile</h3>
-                <form method="post" class="settings-form">{% csrf_token %}
-                    <div class="form-group"><label for="id_first_name">First name</label>{{ form.first_name }}</div>
-                    <div class="form-group"><label for="id_last_name">Last name</label>{{ form.last_name }}</div>
-                    <div class="form-group"><label>Email</label><input class="field" value="{{ request.user.email }}"
-                                                                       disabled></div>
-                    <div class="form-group"><label for="id_phone_number">Phone number</label>{{ form.phone_number }}
-                    </div>
-                    <div class="form-group"><label for="id_cnic">CNIC</label>{{ form.cnic }}</div>
-                    <div class="form-group"><label for="id_address">Address</label>{{ form.address }}</div>
-                    <div class="sticky-actions">
-                        <button class="btn btn-primary" type="submit">Save changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>{% endblock %}
+<section class="content mature-settings">
+  <div class="settings-heading"><div><div class="eyebrow">Personal workspace</div><h1>Account settings</h1><p class="muted">Manage your profile, sign-in security, and workspace access.</p></div></div>
+  <div class="settings-shell">
+    <aside class="settings-sidebar"><div class="settings-nav-title">Settings</div><a class="active" href="#profile">Profile</a><a href="#security">Security</a><a href="#notifications">Notifications</a><a href="#access">Workspace access</a></aside>
+    <div class="settings-main">
+      <form method="post" class="settings-panel" id="profile">{% csrf_token %}<div class="settings-panel-head"><div><h2>Profile information</h2><p>Keep your contact details current for account recovery and report updates.</p></div><span class="settings-badge">Account</span></div><div class="settings-fields"><div class="settings-field"><label for="id_first_name">First name</label>{{ form.first_name }}</div><div class="settings-field"><label for="id_last_name">Last name</label>{{ form.last_name }}</div><div class="settings-field full"><label for="id_email">Email address</label><input id="id_email" value="{{ request.user.email }}" disabled><small>Email is managed by your account identity.</small></div><div class="settings-field"><label for="id_phone_number">Phone number</label>{{ form.phone_number }}</div><div class="settings-field"><label for="id_cnic">CNIC</label>{{ form.cnic }}</div><div class="settings-field full"><label for="id_address">Address</label>{{ form.address }}</div></div><div class="settings-actions"><span>Changes are saved to your CivicFlow account.</span><button class="btn btn-primary" type="submit">Save profile</button></div></form>
+      <section class="settings-panel settings-info" id="security"><div><div><h2>Security</h2><p>Use a strong password and update it regularly.</p></div><a class="btn btn-secondary" href="{% url 'password_change' %}">Change password</a></div></section>
+      <section class="settings-panel settings-info" id="notifications"><div><div><h2>Notifications</h2><p>Report updates are sent to <strong>{{ request.user.email }}</strong>.</p></div><span class="settings-badge success">Email enabled</span></div></section>
+      <section class="settings-panel settings-info" id="access"><div><div><h2>Workspace access</h2><p>Your organization membership and role assignments are managed by administrators.</p></div><a class="btn btn-secondary" href="{% url 'tenants:membership-list' %}">View membership</a></div></section>
+    </div>
+  </div>
+</section>
+{% endblock %}
