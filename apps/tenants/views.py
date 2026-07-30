@@ -14,6 +14,7 @@ from apps.accounts.services import (
     issue_staff_invitation,
     suspend_membership,
 )
+from apps.accounts.models import TenantRole
 
 from .forms import ServiceAreaForm, TenantForm, TenantMembershipForm
 from .models import ServiceArea, Tenant, TenantMembership
@@ -94,7 +95,15 @@ class TenantMembershipListView(StaffRequiredMixin, ListView):
     context_object_name = "memberships"
 
     def get_queryset(self) -> QuerySet[TenantMembership]:
-        return TenantMembership.objects.select_related("tenant", "user", "invited_by")
+        queryset = TenantMembership.objects.select_related("tenant", "user", "invited_by").prefetch_related("role_assignments__role")
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(user__first_name__icontains=query) | queryset.filter(user__last_name__icontains=query) | queryset.filter(user__email__icontains=query)
+        if status := self.request.GET.get("status"):
+            queryset = queryset.filter(status=status)
+        if role := self.request.GET.get("role"):
+            queryset = queryset.filter(role_assignments__role_id=role)
+        return queryset.distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -106,6 +115,8 @@ class TenantMembershipListView(StaffRequiredMixin, ListView):
             membership.status == TenantMembership.Status.INVITED for membership in memberships
         )
         context["tenant_count"] = len({membership.tenant_id for membership in memberships})
+        context["roles"] = TenantRole.objects.order_by("name")
+        context["statuses"] = TenantMembership.Status.choices
         return context
 
 
