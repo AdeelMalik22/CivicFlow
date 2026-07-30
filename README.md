@@ -69,3 +69,61 @@ docker compose up --build
 The application is available at <http://localhost:8000/>.
 
 DemoPass123!
+
+## Current workspace features
+
+CivicFlow includes a public reporting experience and a staff workspace for managing public infrastructure operations.
+
+### Public experience
+
+- Landing page with the accountability chain from report to verified completion
+- Public issue reporting with category, service area, location, description, contact preference, and evidence
+- Secure issue tracking using a report reference and verification code
+- Citizen account area for viewing submitted reports
+- Public “How it works” and accountability pages
+
+### Staff workspace
+
+- Overview dashboard with operational activity and quick actions
+- Reports operations screen at `/reports/` with search, category, status, and service-area filters
+- Report rows showing reference, category, location/service area, status, age, and an Open action
+- Procurement tender creation with category, method, department, service area, budget, deadlines, supplier guidance, contact details, and document uploads
+- Contractor bidding, tender awards, and procurement audit history
+- Organization, service-area, and membership administration
+- Roles and policies backed by database permissions and separation-of-duties policies
+- Account settings with profile editing, password management, notification status, and workspace access information
+- Workspace account menu with Profile, Settings, and secure Sign out actions
+
+### Important workspace routes
+
+| Area | Route |
+| --- | --- |
+| Staff overview | `/workspace/` |
+| Staff reports | `/reports/` |
+| Create issue | `/report/` |
+| Procurement | `/procurement/tenders/` |
+| Organizations | `/workspace/organizations/` |
+| Service areas | `/workspace/organizations/service-areas/` |
+| Memberships | `/workspace/organizations/memberships/` |
+| Roles and policies | `/workspace/access/roles/` |
+| Account settings | `/workspace/profile/settings/` |
+| Change password | `/password-change/` |
+
+### Geographic service areas
+
+Service areas are stored as WGS 84 PostGIS multipolygons. They are used to validate reported locations and route issues to the appropriate organization boundary. The service-area form provides a map boundary editor and a local fallback drawing surface when the external OpenLayers library is unavailable.
+
+### Demo account
+
+The demo seed command creates an administrator account:
+
+```text
+Email: admin@northbridge.gov
+Password: DemoPass123!
+```
+
+Seed the demo data with:
+
+```bash
+python manage.py seed_demo
+```
