@@ -148,3 +148,9 @@ button{cursor:pointer}
 .public-nav .account-menu > summary{background:var(--brand)!important;color:#fff!important;border-radius:50%;width:36px;height:36px;display:grid;place-items:center;list-style:none;cursor:pointer}
 .public-nav .account-menu > summary::-webkit-details-marker{display:none}
 .public-nav .account-menu{margin-right:0!important}
+.feed-row .btn-secondary{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+@media(prefers-color-scheme:dark){
+  .directory-summary,.data-panel,.data-table,.data-table thead,.data-table tbody tr,.data-table td,.data-table th{background:var(--surface);color:var(--ink);border-color:var(--line)}
+  .data-panel-header p,.muted-value,.data-table span{color:var(--muted)}
+  .data-panel-header h2{color:var(--ink)}
+}

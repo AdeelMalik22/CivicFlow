@@ -62,8 +62,11 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("profile")
     def get_object(self, queryset=None): return self.request.user
 
-class AccountSettingsView(LoginRequiredMixin, TemplateView):
+class AccountSettingsView(LoginRequiredMixin, UpdateView):
+    form_class = ProfileForm
     template_name = "accounts/settings.html"
+    success_url = reverse_lazy("settings")
+    def get_object(self, queryset=None): return self.request.user
 
 
 class SignupVerifyView(View):

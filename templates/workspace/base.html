@@ -1,172 +1,38 @@
-{% load static %}
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="CivicFlow secure workspace">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>{% block title %}Workspace — CivicFlow{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <link rel="stylesheet" href="{% static 'css/civicflow.css' %}">
-    <link rel="stylesheet" href="{% static 'css/design-system.css' %}">
-    {% block extra_head %}{% endblock %}
-  </head>
-  <body class="workspace-body">
-    <a class="skip-link" href="#workspace-content">Skip to main content</a>
-
-    <div class="workspace-shell">
-      <aside class="workspace-sidebar" aria-label="Workspace navigation">
-        <a class="brand workspace-brand" href="{% url 'workspace' %}">
-          <span class="brand-mark" aria-hidden="true">CF</span>
-          <span>CivicFlow</span>
-        </a>
-
-        <div class="workspace-context">
-          <span class="context-label">Current workspace</span>
-          <strong>
-            {% if request.tenant %}
-              {{ request.tenant.name }}
-            {% elif request.user.is_staff %}
-              Platform administration
-            {% else %}
-              No organization selected
-            {% endif %}
-          </strong>
-        </div>
-
-        <nav class="workspace-nav">
-          <a
-            class="workspace-nav-item{% if request.resolver_match.url_name == 'workspace' %} is-active{% endif %}"
-            href="{% url 'workspace' %}"
-            {% if request.resolver_match.url_name == 'workspace' %}aria-current="page"{% endif %}
-          >
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg>
-            </span>
-            Overview
-          </a>
-          {% if request.user.is_staff %}
-            <a
-              class="workspace-nav-item{% if request.resolver_match.url_name == 'list' or request.resolver_match.url_name == 'add' or request.resolver_match.url_name == 'edit' %} is-active{% endif %}"
-              href="{% url 'tenants:list' %}"
-              {% if request.resolver_match.url_name == 'list' or request.resolver_match.url_name == 'add' or request.resolver_match.url_name == 'edit' %}aria-current="page"{% endif %}
-            >
-              <span class="nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12h-5v-6H9v6H4Zm2-2h1v-6h10v6h1V9.3l-6-3-6 3V18Z"/></svg>
-              </span>
-              Organizations
-            </a>
-            <a
-              class="workspace-nav-item{% if request.resolver_match.url_name == 'service-area-list' or request.resolver_match.url_name == 'service-area-add' or request.resolver_match.url_name == 'service-area-edit' %} is-active{% endif %}"
-              href="{% url 'tenants:service-area-list' %}"
-              {% if request.resolver_match.url_name == 'service-area-list' or request.resolver_match.url_name == 'service-area-add' or request.resolver_match.url_name == 'service-area-edit' %}aria-current="page"{% endif %}
-            >
-              <span class="nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
-              </span>
-              Service areas
-            </a>
-            <a
-              class="workspace-nav-item{% if request.resolver_match.url_name == 'membership-list' or request.resolver_match.url_name == 'membership-add' or request.resolver_match.url_name == 'membership-edit' %} is-active{% endif %}"
-              href="{% url 'tenants:membership-list' %}"
-              {% if request.resolver_match.url_name == 'membership-list' or request.resolver_match.url_name == 'membership-add' or request.resolver_match.url_name == 'membership-edit' %}aria-current="page"{% endif %}
-            >
-              <span class="nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3Zm-8 0c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3Zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13Zm8 0c-.3 0-.7 0-1 .1 1.2.9 2 2 2 3.4V19h6v-2.5c0-2.3-4.7-3.5-7-3.5Z"/></svg>
-              </span>
-              Memberships
-            </a>
-            <a
-              class="workspace-nav-item{% if request.resolver_match.namespace == 'accounts' %} is-active{% endif %}"
-              href="{% url 'accounts:role-list' %}"
-              {% if request.resolver_match.namespace == 'accounts' %}aria-current="page"{% endif %}
-            >
-              <span class="nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm0 3 5 1.9V11c0 3.5-2.1 7-5 8.2C9.1 18 7 14.5 7 11V6.9L12 5Z"/></svg>
-              </span>
-              Roles &amp; policies
-            </a>
-          {% endif %}
-          {% if can_administer_tenant %}
-            <a
-              class="workspace-nav-item{% if request.resolver_match.namespace == 'tenant-admin' %} is-active{% endif %}"
-              href="{% url 'tenant-admin:dashboard' %}"
-              {% if request.resolver_match.namespace == 'tenant-admin' %}aria-current="page"{% endif %}
-            >
-              <span class="nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm-4 9.2c1.1-1.4 2.4-2.2 4-2.2s2.9.8 4 2.2c-1 1.8-2.4 3.2-4 3.9-1.6-.7-3-2.1-4-3.9Z"/></svg>
-              </span>
-              Administration
-            </a>
-          {% endif %}
-          <span class="workspace-nav-heading">Product modules</span>
-          <a class="workspace-nav-item" href="{% url 'issues:my_reports' %}">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm3 4v2h10V8H7Zm0 4v2h7v-2H7Z"/></svg>
-            </span>
-            Reports
-          </a>
-          <a class="workspace-nav-item" href="{% url 'procurement:tenders' %}">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3V6Z"/></svg>
-            </span>
-            Projects
-          </a>
-          <a class="workspace-nav-item" href="{% url 'procurement:tenders' %}">
-            <span class="nav-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M5 4h14v16H5V4Zm3 4v2h8V8H8Zm0 4v2h8v-2H8Z"/></svg>
-            </span>
-            Procurement
-          </a>
-        </nav>
-
-        <div class="workspace-sidebar-footer">
-          <a href="{% url 'home' %}">View public site</a>
-          <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit">Sign out</button>
-          </form>
-        </div>
-      </aside>
-
-      <div class="workspace-main ds-workspace-main">
-        <header class="workspace-header">
-          <div>
-            <button class="mobile-menu-button" type="button" aria-label="Open navigation" disabled>
-              <span></span><span></span><span></span>
-            </button>
-          </div>
-          <details class="workspace-user account-menu">
-            <summary>
-            <span class="workspace-user-copy">
-              <strong>{{ request.user.get_full_name|default:request.user.email }}</strong>
-              <span>{% if request.user.is_staff %}Platform staff{% else %}{% endif %}</span>
-            </span>
-            <span class="user-avatar" aria-hidden="true">
-              {{ request.user.email|first|upper }}
-            </span>
-            </summary>
-            <div class="account-menu-panel">
-              <a href="{% url 'profile' %}">Profile</a>
-              <a href="{% url 'settings' %}">Settings</a>
-              <a href="{% url 'issues:my_reports' %}">My reports</a>
-              <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form>
-            </div>
-          </details>
+    {% block extra_head %}{% endblock %}</head>
+<body>
+<div class="workspace">
+    <aside class="sidebar"><a class="brand" href="{% url 'workspace' %}"><span
+            class="brand-mark"></span><span>CivicFlow</span></a>
+        <div class="org-switch"><small>Organisation</small><br><span>{% if request.tenant %}
+            {{ request.tenant.name }}{% else %}CivicFlow workspace{% endif %}</span></div>
+        <nav class="side-nav"><a href="{% url 'workspace' %}"><span>Overview</span></a><a
+                href="{% url 'issues:my_reports' %}"><span>Reports</span></a><a
+                href="{% url 'procurement:tenders' %}"><span>Projects</span></a><a
+                href="{% url 'procurement:tenders' %}"><span>Procurement</span></a>{% if request.user.is_staff %}
+            <a href="{% url 'tenants:list' %}"><span>Organizations</span></a>
+            <a href="{% url 'tenants:service-area-list' %}"><span>Service areas</span></a>
+            <a href="{% url 'tenants:membership-list' %}"><span>Memberships</span></a>
+            <a href="{% url 'accounts:role-list' %}"><span>Roles &amp; policies</span></a>{% endif %}<a
+                href="{% url 'settings' %}"><span>Settings</span></a></nav>
+        <div class="account">
+            <span>{{ request.user.get_full_name|default:request.user.email }}<br><small>{% if request.user.is_staff %}
+                Administrator{% else %}Citizen{% endif %}</small></span></div>
+    </aside>
+    <main class="main">
+        <header class="topbar">
+            <div class="command">Search reports, tenders, people… <span style="float:right">⌘ K</span></div>
+            {% if request.user.is_staff %}
+                <a class="btn btn-secondary" href="{% url 'tenants:membership-add' %}">Invite staff</a>{% endif %}
         </header>
-
-        <main id="workspace-content" class="workspace-content">
-          {% if messages %}
-            <div class="messages" aria-live="polite">
-              {% for message in messages %}
-                <p class="message message-{{ message.tags|default:'info' }}">{{ message }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-          {% block workspace_content %}{% endblock %}
-        </main>
-      </div>
-    </div>
-    {% block extra_scripts %}{% endblock %}
-  </body>
+        <main class="workspace-page">{% block workspace_content %}{% endblock %}</main>
+    </main>
+</div>
+{% block extra_scripts %}{% endblock %}</body>
 </html>

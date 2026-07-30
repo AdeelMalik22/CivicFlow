@@ -105,3 +105,30 @@ class MyIssueListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Issue.objects.filter(reporter=self.request.user).select_related("service_area")
+
+
+class IssueOperationsListView(LoginRequiredMixin, ListView):
+    template_name = "issues/reports.html"
+    context_object_name = "issues"
+    def get_queryset(self):
+        queryset = Issue.objects.select_related("service_area", "tenant").order_by("-created_at")
+        tenant = getattr(self.request, "tenant", None)
+        if tenant:
+            queryset = queryset.filter(tenant=tenant)
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(reference__icontains=query) | queryset.filter(description__icontains=query)
+        if category := self.request.GET.get("category"):
+            queryset = queryset.filter(category=category)
+        if status := self.request.GET.get("status"):
+            queryset = queryset.filter(status=status)
+        if area := self.request.GET.get("area"):
+            queryset = queryset.filter(service_area_id=area)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Issue.Category.choices
+        context["statuses"] = Issue.Status.choices
+        context["service_areas"] = self.get_queryset().model.service_area.field.related_model.objects.filter(tenant=self.request.tenant, is_active=True) if getattr(self.request, "tenant", None) else []
+        return context
