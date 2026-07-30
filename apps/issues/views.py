@@ -1,16 +1,23 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.views.generic import FormView, TemplateView
+from django.views.generic import FormView, ListView, TemplateView
 
 from .forms import IssueReportForm, PublicTrackingForm
 from .models import Issue
 from .services import submit_issue
 
 
-class IssueReportView(FormView):
+class IssueReportView(LoginRequiredMixin, FormView):
     template_name = "issues/report_form.html"
     form_class = IssueReportForm
+    login_url = "login"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -79,8 +86,22 @@ class PublicIssueTrackingView(TemplateView):
             .filter(reference=kwargs["reference"].upper())
             .first()
         )
-        if issue is None or not issue.check_tracking_token(kwargs["token"]):
+        owns_issue = (
+            self.request.user.is_authenticated
+            and issue
+            and issue.reporter_id == self.request.user.id
+        )
+        if issue is None or (not owns_issue and not issue.check_tracking_token(kwargs["token"])):
             raise Http404
         context["issue"] = issue
         context["events"] = issue.status_events.all()
         return context
+
+
+class MyIssueListView(LoginRequiredMixin, ListView):
+    template_name = "issues/my_reports.html"
+    context_object_name = "issues"
+    login_url = "login"
+
+    def get_queryset(self):
+        return Issue.objects.filter(reporter=self.request.user).select_related("service_area")

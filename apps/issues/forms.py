@@ -72,13 +72,18 @@ class IssueReportForm(forms.ModelForm):
         help_texts = {
             "service_area": "Choose the supported area where the issue is located.",
             "location": "Drop the pin as close as possible to the issue.",
-            "contact_email": "Optional. Used only if you request email updates.",
+            "contact_email": (
+                "Pre-filled from your account; used only if you request email updates."
+            ),
             "contact_preference": "Your public report never displays your email address.",
         }
 
     def __init__(self, *args, **kwargs) -> None:
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         self.fields["service_area"].queryset = ServiceArea.objects.active().select_related("tenant")
+        if user is not None and getattr(user, "is_authenticated", False):
+            self.fields["contact_email"].initial = user.email
 
     def clean(self):
         cleaned_data = super().clean()

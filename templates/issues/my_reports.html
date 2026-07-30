@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}My reports — CivicFlow{% endblock %}
+{% block content %}
+<section class="tracking-section"><div class="container">
+  <p class="eyebrow">Citizen account</p><h1>My reports</h1>
+  <p class="section-intro">Track issues you have submitted from one place.</p>
+  <div class="tracking-card">
+    {% for issue in issues %}
+      <a class="report-list-item" href="{% url 'issues:track' reference=issue.reference token='account' %}">
+        <span><strong>{{ issue.reference }}</strong><small>{{ issue.get_category_display }} · {{ issue.service_area.name }}</small></span>
+        <span class="status-badge status-{{ issue.status }}">{{ issue.get_status_display }}</span>
+      </a>
+    {% empty %}<p>You have not reported any issues yet.</p>{% endfor %}
+  </div>
+</div></section>
+{% endblock %}

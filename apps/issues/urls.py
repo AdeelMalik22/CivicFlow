@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     IssueReportView,
     IssueSubmittedView,
+    MyIssueListView,
     PublicIssueTrackingView,
     PublicTrackingLookupView,
 )
@@ -17,6 +18,7 @@ urlpatterns = [
         name="submitted",
     ),
     path("track/", PublicTrackingLookupView.as_view(), name="track-lookup"),
+    path("my-reports/", MyIssueListView.as_view(), name="my_reports"),
     path(
         "track/<str:reference>/<str:token>/",
         PublicIssueTrackingView.as_view(),
