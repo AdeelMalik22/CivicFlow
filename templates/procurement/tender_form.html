@@ -1,1 +1,27 @@
-{% extends "base.html" %}{% block content %}<section class="tracking-section"><div class="container"><h1>Create tender</h1><form method="post" class="auth-form">{% csrf_token %}{{ form.as_p }}<button class="button button-primary">Save tender</button></form></div></section>{% endblock %}
+{% extends "workspace/base.html" %}
+{% block title %}Create tender — CivicFlow{% endblock %}
+{% block workspace_content %}
+<section class="content tender-editor">
+  <div class="page-head"><div><div class="eyebrow">Transparent procurement</div><h1>Create tender</h1><p class="muted">Publish a complete, auditable opportunity for qualified suppliers.</p></div><a class="btn btn-secondary" href="{% url 'procurement:tenders' %}">Cancel</a></div>
+  <form method="post" enctype="multipart/form-data" class="tender-form">{% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="tender-grid">
+      <div>
+        <section class="panel form-section"><div class="section-label">1 · Opportunity basics</div><h2>What are you procuring?</h2><p class="muted">Give suppliers enough context to understand the opportunity.</p>
+          <div class="form-grid two"><label>Title {{ form.title }}{{ form.title.errors }}</label><label>Reference {{ form.reference }}{{ form.reference.errors }}</label><label>Category {{ form.category }}{{ form.category.errors }}</label><label>Procurement method {{ form.procurement_method }}{{ form.procurement_method.errors }}</label></div>
+          <label>Description {{ form.description }}{{ form.description.errors }}</label>
+        </section>
+        <section class="panel form-section"><div class="section-label">2 · Location and value</div><h2>Where and at what scale?</h2>
+          <div class="form-grid two"><label>Department {{ form.department }}{{ form.department.errors }}</label><label>Service area {{ form.service_area }}{{ form.service_area.errors }}</label><label>Estimated budget {{ form.budget }}{{ form.budget.errors }}</label><label>Currency {{ form.currency }}{{ form.currency.errors }}</label></div>
+        </section>
+        <section class="panel form-section"><div class="section-label">3 · Supplier guidance</div><h2>Set clear expectations</h2>
+          <label>Eligibility requirements {{ form.eligibility }}{{ form.eligibility.errors }}</label><label>Evaluation criteria {{ form.evaluation_criteria }}{{ form.evaluation_criteria.errors }}</label><label>Submission instructions {{ form.submission_instructions }}{{ form.submission_instructions.errors }}</label>
+        </section>
+        <section class="panel form-section"><div class="section-label">4 · Supporting material</div><h2>Add the tender pack</h2><p class="muted">Attach specifications, drawings, terms of reference, or a bill of quantities.</p><div class="form-grid two"><label>Cover image <span class="hint">Optional</span>{{ form.cover_image }}{{ form.cover_image.errors }}</label><label>Tender documents <span class="hint">PDF or office document</span>{{ form.attachment }}{{ form.attachment.errors }}</label></div>
+        </section>
+      </div>
+      <aside><section class="panel form-section sticky"><div class="section-label">Publish settings</div><h2>When should this go live?</h2><label>Clarification deadline <span class="hint">Optional</span>{{ form.clarification_deadline }}{{ form.clarification_deadline.errors }}</label><label>Submission deadline {{ form.deadline }}{{ form.deadline.errors }}</label><label>Procurement contact {{ form.contact_name }}{{ form.contact_name.errors }}</label><label>Contact email {{ form.contact_email }}{{ form.contact_email.errors }}</label><label class="check-row">{{ form.published }} <span>Publish immediately</span></label><p class="hint">Leave unchecked to save this as a draft for review.</p><button class="btn btn-primary full" type="submit">Save tender</button></section></aside>
+    </div>
+  </form>
+</section>
+{% endblock %}

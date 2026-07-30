@@ -19,7 +19,18 @@ class TenderCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     template_name = "procurement/tender_form.html"
     success_url = reverse_lazy("procurement:tenders")
     def test_func(self): return self.request.user.is_staff
-    def form_valid(self, form): form.instance.created_by = self.request.user; return super().form_valid(form)
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        tenant = getattr(self.request, "tenant", None)
+        if tenant:
+            form.fields["department"].queryset = form.fields["department"].queryset.filter(tenant=tenant)
+            form.fields["service_area"].queryset = form.fields["service_area"].queryset.filter(tenant=tenant, is_active=True)
+        return form
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        response = super().form_valid(form)
+        ProcurementAuditEvent.objects.create(tender=self.object, actor=self.request.user, action="published" if self.object.published else "draft_created", note="Tender created")
+        return response
 
 class BidCreateView(LoginRequiredMixin, CreateView):
     form_class = BidForm
