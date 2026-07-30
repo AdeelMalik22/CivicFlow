@@ -189,6 +189,11 @@ class TenantMembershipFormMixin(TenantBoundFormMixin, UserManagementPermissionMi
     def get_queryset(self):
         return TenantMembership.objects.for_request(self.request)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["inviter"] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         form.assigned_by = self.request.user
         was_adding = form.instance._state.adding

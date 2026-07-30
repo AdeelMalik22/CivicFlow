@@ -123,6 +123,7 @@ class TenantMembershipForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs) -> None:
+        self.inviter = kwargs.pop("inviter", None)
         super().__init__(*args, **kwargs)
         tenant_field = self.fields["tenant"]
         tenant_field.queryset = Tenant.objects.order_by("name")
@@ -162,6 +163,22 @@ class TenantMembershipForm(forms.ModelForm):
                 membership_assignments__membership=self.instance
             )
 
+        self.manager_restricted = False
+        if self.inviter and not self.inviter.is_superuser:
+            inviter_membership = TenantMembership.objects.active().filter(
+                user=self.inviter, tenant_id=tenant_id
+            ).first()
+            if inviter_membership and inviter_membership.role_assignments.filter(
+                role__is_active=True, role__code__in=("manager", "department-manager")
+            ).exists():
+                self.manager_restricted = True
+                department_field.queryset = department_field.queryset.filter(
+                    memberships__user=self.inviter
+                ).distinct()
+                self.fields["roles"].queryset = self.fields["roles"].queryset.filter(
+                    code__in=("officer", "inspector")
+                )
+
     def clean_email(self) -> str:
         email = self.cleaned_data["email"].strip().lower()
         if self.instance.pk:
@@ -175,6 +192,12 @@ class TenantMembershipForm(forms.ModelForm):
         department = cleaned_data.get("department")
         if department and tenant and department.tenant_id != tenant.id:
             self.add_error("department", "Select a department in the selected organization.")
+        if self.manager_restricted:
+            if not department or not department.memberships.filter(user=self.inviter).exists():
+                self.add_error("department", "You may only invite staff to your own department.")
+            roles = cleaned_data.get("roles")
+            if roles and roles.exclude(code__in=("officer", "inspector")).exists():
+                self.add_error("roles", "Managers may invite only Officers or Inspectors.")
         if not self.instance.pk and email and tenant:
             existing_user = User.objects.filter(email__iexact=email).first()
             if existing_user and TenantMembership.objects.filter(
