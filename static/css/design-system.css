@@ -21,6 +21,7 @@
 body { background: var(--ds-bg); color: var(--ds-text); font-family: var(--ds-font); letter-spacing: -0.01em; }
 .ds-site-header { position: sticky; top: 0; z-index: 30; border-bottom: 1px solid var(--ds-line); background: color-mix(in srgb, var(--ds-surface) 90%, transparent); backdrop-filter: blur(16px); }
 .ds-site-header .header-inner { min-height: 72px; }
+.ds-site-header .brand { color: var(--ds-text); }
 .ds-primary-nav { gap: 1.5rem; }
 .ds-primary-nav > a:not(.button) { color: var(--ds-muted); font-size: .9rem; font-weight: 600; }
 .ds-primary-nav > a:not(.button):hover { color: var(--ds-text); }
@@ -35,6 +36,8 @@ body { background: var(--ds-bg); color: var(--ds-text); font-family: var(--ds-fo
 .status-card, .feature-card, .action-card { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--ds-surface); box-shadow: var(--ds-shadow-lg); }
 .status-card { padding: 2rem; }
 .section { padding: 6rem 0; }
+.section-tinted { background: var(--ds-surface); color: var(--ds-text); }
+.section-tinted p, .section-tinted .principle-list p { color: var(--ds-muted); }
 .section-heading h2, .accountability-grid h2 { letter-spacing: -.045em; font-size: clamp(2rem, 4vw, 3.5rem); }
 .feature-card, .action-card { padding: 1.75rem; transition: transform .2s ease, box-shadow .2s ease; }
 .feature-card:hover, .action-card:hover { transform: translateY(-4px); box-shadow: var(--ds-shadow-lg); }
