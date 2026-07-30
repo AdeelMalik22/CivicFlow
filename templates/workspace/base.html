@@ -29,8 +29,7 @@
     <main class="main">
         <header class="topbar">
             <div class="command">Search reports, tenders, people… <span style="float:right">⌘ K</span></div>
-            {% if request.user.is_staff %}
-                <a class="btn btn-secondary" href="{% url 'tenants:membership-add' %}">Invite staff</a>{% endif %}
+            <div class="topbar-actions">{% if request.user.is_staff and request.resolver_match.url_name == 'workspace' %}<a class="btn btn-secondary" href="{% url 'tenants:membership-add' %}">Invite staff</a>{% endif %}<details class="workspace-account"><summary class="workspace-profile" aria-label="Open account menu">{{ request.user.first_name|default:request.user.email|slice:":1"|upper }}</summary><div class="workspace-account-menu"><div class="account-menu-identity"><strong>{{ request.user.get_full_name|default:request.user.email }}</strong><span>{{ request.user.email }}</span></div><a href="{% url 'profile' %}">Profile</a><a href="{% url 'settings' %}">Settings</a><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form></div></details></div>
         </header>
         <main class="workspace-page">{% block workspace_content %}{% endblock %}</main>
     </main>
