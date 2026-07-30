@@ -9,12 +9,14 @@ from .views import (
     TenantMembershipCreateView,
     TenantMembershipListView,
     TenantMembershipUpdateView,
+    TenantSwitchView,
     TenantUpdateView,
 )
 
 app_name = "tenants"
 
 urlpatterns = [
+    path("select/<uuid:public_id>/", TenantSwitchView.as_view(), name="select"),
     path("", TenantListView.as_view(), name="list"),
     path("add/", TenantCreateView.as_view(), name="add"),
     path("<int:pk>/edit/", TenantUpdateView.as_view(), name="edit"),

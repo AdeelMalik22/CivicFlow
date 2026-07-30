@@ -37,6 +37,11 @@ class RequestContextMiddleware:
                     if hasattr(request, "user") and request.user.is_authenticated
                     else None
                 ),
+                "tenant_id": (
+                    str(request.tenant.public_id)
+                    if getattr(request, "tenant", None) is not None
+                    else None
+                ),
             },
         )
         return response

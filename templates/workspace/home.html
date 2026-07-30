@@ -3,6 +3,35 @@
 {% block title %}Overview — CivicFlow{% endblock %}
 
 {% block workspace_content %}
+  {% if available_memberships %}
+    <section class="workspace-card tenant-switcher-card" aria-labelledby="tenant-switcher-title">
+      <div class="workspace-card-header">
+        <div>
+          <p class="panel-kicker">Organization access</p>
+          <h2 id="tenant-switcher-title">Choose your workspace</h2>
+          <p>Your selection is verified against active memberships on every request.</p>
+        </div>
+      </div>
+      <div class="tenant-switcher-grid">
+        {% for membership in available_memberships %}
+          <form method="post" action="{% url 'tenants:select' membership.tenant.public_id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="tenant-switch-option{% if request.tenant == membership.tenant %} is-active{% endif %}">
+              <span class="entity-avatar" aria-hidden="true">{{ membership.tenant.name|first|upper }}</span>
+              <span><strong>{{ membership.tenant.name }}</strong><small>{{ membership.get_status_display }}</small></span>
+              {% if request.tenant == membership.tenant %}<span class="tenant-current-mark">Current</span>{% else %}<span aria-hidden="true">→</span>{% endif %}
+            </button>
+          </form>
+        {% endfor %}
+      </div>
+    </section>
+  {% elif not request.user.is_staff %}
+    <section class="workspace-card">
+      <h2>No active organization access</h2>
+      <p>Ask a platform administrator to activate your membership.</p>
+    </section>
+  {% endif %}
   <div class="page-header">
     <div>
       <p class="eyebrow">Workspace overview</p>

@@ -21,7 +21,15 @@
 
         <div class="workspace-context">
           <span class="context-label">Current workspace</span>
-          <strong>Platform foundation</strong>
+          <strong>
+            {% if request.tenant %}
+              {{ request.tenant.name }}
+            {% elif request.user.is_staff %}
+              Platform administration
+            {% else %}
+              No organization selected
+            {% endif %}
+          </strong>
         </div>
 
         <nav class="workspace-nav">

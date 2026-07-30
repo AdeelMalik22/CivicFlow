@@ -10,6 +10,8 @@ from django.db import models
 from django.db.models.functions import Lower
 from django.utils import timezone
 
+from .scoping import TenantScopedQuerySet
+
 
 def validate_timezone(value: str) -> None:
     """Ensure tenant timezones use a recognized IANA identifier."""
@@ -76,6 +78,10 @@ class Tenant(models.Model):
         super().save(*args, **kwargs)
 
 
+class DepartmentQuerySet(TenantScopedQuerySet):
+    pass
+
+
 class Department(models.Model):
     """An operational unit belonging to exactly one tenant."""
 
@@ -95,6 +101,8 @@ class Department(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = DepartmentQuerySet.as_manager()
 
     class Meta:
         ordering = ("tenant__name", "name")
@@ -120,7 +128,7 @@ class Department(models.Model):
         super().save(*args, **kwargs)
 
 
-class ServiceAreaQuerySet(models.QuerySet):
+class ServiceAreaQuerySet(TenantScopedQuerySet):
     def active(self):
         return self.filter(is_active=True, tenant__status=Tenant.Status.ACTIVE)
 
@@ -186,7 +194,7 @@ class ServiceArea(models.Model):
             raise ValidationError({"boundary": "Enter a non-empty, valid multipolygon boundary."})
 
 
-class TenantMembershipQuerySet(models.QuerySet):
+class TenantMembershipQuerySet(TenantScopedQuerySet):
     def active(self):
         return self.filter(
             status=TenantMembership.Status.ACTIVE,

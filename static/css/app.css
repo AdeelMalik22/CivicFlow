@@ -1601,6 +1601,63 @@ h3 {
   text-decoration: none;
 }
 
+.tenant-switcher-card {
+  margin-bottom: 1.25rem;
+}
+
+.tenant-switcher-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tenant-switcher-grid form {
+  margin: 0;
+}
+
+.tenant-switch-option {
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: white;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tenant-switch-option:hover {
+  border-color: #9abce9;
+  background: #f7faff;
+}
+
+.tenant-switch-option.is-active {
+  border-color: #8bb1e6;
+  background: #eef5ff;
+}
+
+.tenant-switch-option strong,
+.tenant-switch-option small {
+  display: block;
+}
+
+.tenant-switch-option small {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+}
+
+.tenant-current-mark {
+  color: #116149;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 /* Organization directory */
 
 .directory-summary {
@@ -1963,6 +2020,10 @@ h3 {
   .accountability-grid,
   .sign-in-layout,
   .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tenant-switcher-grid {
     grid-template-columns: 1fr;
   }
 

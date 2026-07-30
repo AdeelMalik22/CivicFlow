@@ -1,11 +1,16 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Q, QuerySet
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
 from .forms import ServiceAreaForm, TenantForm, TenantMembershipForm
 from .models import ServiceArea, Tenant, TenantMembership
+from .request import activate_tenant
 
 
 class StaffRequiredMixin(UserPassesTestMixin):
@@ -15,6 +20,21 @@ class StaffRequiredMixin(UserPassesTestMixin):
 
     def test_func(self) -> bool:
         return self.request.user.is_authenticated and self.request.user.is_staff
+
+
+class TenantSwitchView(LoginRequiredMixin, View):
+    def post(self, request, public_id):
+        tenant = get_object_or_404(Tenant, public_id=public_id)
+        activate_tenant(request, tenant)
+        messages.success(request, f"Switched to {tenant.name}.")
+        next_url = request.POST.get("next", "")
+        if not url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = reverse_lazy("workspace")
+        return HttpResponseRedirect(next_url)
 
 
 class TenantListView(StaffRequiredMixin, ListView):

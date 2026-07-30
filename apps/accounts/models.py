@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.functions import Lower
 
+from apps.tenants.scoping import TenantScopedQuerySet
+
 from .managers import UserManager
 
 
@@ -66,6 +68,8 @@ class TenantRole(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = TenantScopedQuerySet.as_manager()
 
     class Meta:
         ordering = ("tenant__name", "name")
@@ -177,6 +181,8 @@ class SeparationOfDutiesPolicy(models.Model):
         related_name="approver_policies",
     )
     is_active = models.BooleanField(default=True)
+
+    objects = TenantScopedQuerySet.as_manager()
 
     class Meta:
         ordering = ("tenant__name", "name")
