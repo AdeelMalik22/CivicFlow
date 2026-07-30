@@ -133,3 +133,9 @@ class CitizenRegistrationForm(forms.ModelForm):
 
 class SignupOTPForm(forms.Form):
     code = forms.CharField(min_length=6, max_length=6, label="Verification code")
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ("first_name", "last_name", "phone_number", "cnic", "address")

@@ -45,6 +45,7 @@ urlpatterns = [
     ),
     path("sign-up/", include("apps.accounts.signup_urls")),
     path("signup/", include("apps.accounts.signup_urls")),
+    path("profile/", include("apps.accounts.profile_urls")),
     path(
         "sign-out/",
         auth_views.LogoutView.as_view(next_page="home"),

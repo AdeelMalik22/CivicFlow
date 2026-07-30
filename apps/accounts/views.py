@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Count, Q, QuerySet
@@ -15,13 +15,14 @@ from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.views import View
-from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic import CreateView, ListView, TemplateView, UpdateView
 
 from .forms import (
     CitizenRegistrationForm,
     InvitationSetPasswordForm,
     SeparationOfDutiesPolicyForm,
     SignupOTPForm,
+    ProfileForm,
     TenantRoleForm,
 )
 from .models import SeparationOfDutiesPolicy, SignupOTP, StaffInvitation, TenantRole
@@ -53,6 +54,13 @@ class CitizenRegistrationView(CreateView):
             [self.object.email],
         )
         return redirect("signup-verify", user_id=self.object.pk)
+
+
+class ProfileView(LoginRequiredMixin, UpdateView):
+    form_class = ProfileForm
+    template_name = "accounts/profile.html"
+    success_url = reverse_lazy("profile")
+    def get_object(self, queryset=None): return self.request.user
 
 
 class SignupVerifyView(View):
