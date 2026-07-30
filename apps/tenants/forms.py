@@ -117,7 +117,7 @@ class TenantMembershipForm(forms.ModelForm):
 
     class Meta:
         model = TenantMembership
-        fields = ("tenant",)
+        fields = ("tenant", "department")
         help_texts = {
             "tenant": "The organization this account may access.",
         }
@@ -142,6 +142,15 @@ class TenantMembershipForm(forms.ModelForm):
             self.fields["last_name"].initial = self.instance.user.last_name
             self.fields["email"].disabled = True
 
+        department_field = self.fields["department"]
+        department_field.queryset = Department.objects.filter(is_active=True).order_by("name")
+        department_field.empty_label = "Select a department"
+        if tenant_id := (self.instance.tenant_id if self.instance.pk else self.data.get("tenant")):
+            department_field.queryset = department_field.queryset.filter(tenant_id=tenant_id)
+        if self.instance.pk:
+            department_field.initial = self.instance.department_id
+            department_field.disabled = True
+
         tenant_id = self.instance.tenant_id if self.instance.pk else self.data.get("tenant")
         if tenant_id:
             self.fields["roles"].queryset = TenantRole.objects.filter(
@@ -163,6 +172,9 @@ class TenantMembershipForm(forms.ModelForm):
         cleaned_data = super().clean()
         email = cleaned_data.get("email")
         tenant = cleaned_data.get("tenant")
+        department = cleaned_data.get("department")
+        if department and tenant and department.tenant_id != tenant.id:
+            self.add_error("department", "Select a department in the selected organization.")
         if not self.instance.pk and email and tenant:
             existing_user = User.objects.filter(email__iexact=email).first()
             if existing_user and TenantMembership.objects.filter(

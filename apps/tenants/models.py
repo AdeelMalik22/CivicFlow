@@ -220,6 +220,14 @@ class TenantMembership(models.Model):
         on_delete=models.PROTECT,
         related_name="memberships",
     )
+    department = models.ForeignKey(
+        Department,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="memberships",
+        help_text="The department this staff member belongs to.",
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -264,6 +272,8 @@ class TenantMembership(models.Model):
         return f"{self.user.email} — {self.tenant.name}"
 
     def save(self, *args, **kwargs) -> None:
+        if self.department_id and self.tenant_id and self.department.tenant_id != self.tenant_id:
+            raise ValidationError("The department must belong to the selected organization.")
         now = timezone.now()
         if self.status == self.Status.ACTIVE:
             self.activated_at = self.activated_at or now

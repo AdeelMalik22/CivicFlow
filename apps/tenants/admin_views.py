@@ -126,6 +126,10 @@ class TenantBoundFormMixin:
             form.fields["roles"].queryset = TenantRole.objects.for_tenant(
                 self.request.tenant
             ).filter(is_active=True)
+        if "department" in form.fields:
+            form.fields["department"].queryset = Department.objects.for_tenant(
+                self.request.tenant
+            ).filter(is_active=True)
         return form
 
 
