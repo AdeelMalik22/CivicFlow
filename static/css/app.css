@@ -153,10 +153,12 @@ h3 {
 }
 
 .account-menu { position: relative; }
-.account-menu summary { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--ink); color: white; cursor: pointer; font-weight: 700; list-style: none; }
-.account-menu summary::-webkit-details-marker { display: none; }
+.primary-nav .account-menu summary { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--ink); color: white; cursor: pointer; font-weight: 700; list-style: none; }
+.primary-nav .account-menu summary::-webkit-details-marker { display: none; }
 .workspace-user.account-menu > summary { display: flex; align-items: center; gap: .75rem; list-style: none; cursor: pointer; }
 .workspace-user.account-menu > summary::-webkit-details-marker { display: none; }
+.workspace-user.account-menu > summary .workspace-user-copy { display: block; }
+.workspace-user.account-menu > summary .user-avatar { flex: 0 0 auto; }
 .account-menu-panel { position: absolute; right: 0; top: calc(100% + .75rem); z-index: 20; width: 15rem; padding: .5rem; border: 1px solid var(--line); border-radius: .75rem; background: white; box-shadow: var(--shadow); }
 .account-menu-header { padding: .75rem; border-bottom: 1px solid var(--line); }
 .account-menu-header strong, .account-menu-header span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

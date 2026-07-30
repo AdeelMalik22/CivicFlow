@@ -139,7 +139,7 @@
             <summary>
             <span class="workspace-user-copy">
               <strong>{{ request.user.get_full_name|default:request.user.email }}</strong>
-              <span>{% if request.user.is_staff %}Platform staff{% else %}Authenticated user{% endif %}</span>
+              <span>{% if request.user.is_staff %}Platform staff{% else %}{% endif %}</span>
             </span>
             <span class="user-avatar" aria-hidden="true">
               {{ request.user.email|first|upper }}
