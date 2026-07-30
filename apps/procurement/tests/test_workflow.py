@@ -5,6 +5,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core import mail
 
 from apps.accounts.models import User
 from apps.contractors.models import ContractorApplication
@@ -67,3 +68,5 @@ def test_award_creates_audit_and_closes_tender(client, contractor, tender):
     assert ProcurementAuditEvent.objects.filter(tender=tender, action="award_finalized").exists()
     tender.refresh_from_db()
     assert tender.published is False
+    assert len(mail.outbox) == 1
+    assert contractor.email in mail.outbox[0].to

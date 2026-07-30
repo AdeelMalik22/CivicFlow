@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.gis.forms import OSMWidget
 from django.core.exceptions import ValidationError
+import re
 
 from apps.tenants.models import ServiceArea
 
@@ -88,6 +89,25 @@ class IssueReportForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        service_area = cleaned_data.get("service_area")
+        location = cleaned_data.get("location")
+        if self.data.get("service_area") and not service_area:
+            self.add_error("service_area", "Select an active service area.")
+        outside = False
+        raw_location = self.data.get("location", "")
+        coordinates = re.search(r"POINT\s*\(\s*([\d.-]+)\s+([\d.-]+)\s*\)", raw_location)
+        if service_area and coordinates:
+            x, y = map(float, coordinates.groups())
+            min_x, min_y, max_x, max_y = service_area.boundary.extent
+            outside = not (min_x <= x <= max_x and min_y <= y <= max_y)
+        if service_area and not location:
+            self.add_error("location", "Enter a valid map location inside the selected service area.")
+        elif service_area and location:
+            if not coordinates:
+                min_x, min_y, max_x, max_y = service_area.boundary.extent
+                outside = not (min_x <= location.x <= max_x and min_y <= location.y <= max_y)
+        if outside:
+            self.add_error("location", "The location must be inside the selected service area.")
         if self.user is not None and not self.user.email_verified:
             self.add_error(None, "Verify your email address before submitting a report.")
         if self.user is not None and not self.user.cnic:

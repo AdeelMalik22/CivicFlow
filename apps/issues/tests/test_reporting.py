@@ -45,6 +45,10 @@ def test_report_form_rejects_location_outside_selected_service_area():
 @pytest.mark.django_db
 def test_anonymous_report_receives_reference_and_private_tracking_code(client: Client):
     area = service_area("Central", "City", "city")
+    user = User.objects.create_user(
+        email="citizen@example.com", password="pass", cnic="12345", email_verified=True
+    )
+    client.force_login(user)
 
     response = client.post(
         reverse("issues:report"),
