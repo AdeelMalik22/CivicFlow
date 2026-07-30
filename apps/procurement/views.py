@@ -24,6 +24,7 @@ class TenderCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 class BidCreateView(LoginRequiredMixin, CreateView):
     form_class = BidForm
     template_name = "procurement/bid_form.html"
+    success_url = reverse_lazy("procurement:tenders")
     def dispatch(self, request, *args, **kwargs):
         self.tender = get_object_or_404(Tender, pk=kwargs["pk"], published=True)
         already_bid = Bid.objects.filter(tender=self.tender, contractor=request.user).exists()
@@ -38,6 +39,7 @@ class BidCreateView(LoginRequiredMixin, CreateView):
 class AwardCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     form_class = AwardForm
     template_name = "procurement/award_form.html"
+    success_url = reverse_lazy("procurement:tenders")
     def test_func(self): return self.request.user.is_staff
     def dispatch(self, request, *args, **kwargs):
         self.tender = get_object_or_404(Tender, pk=kwargs["pk"])
