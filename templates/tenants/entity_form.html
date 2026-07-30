@@ -1,0 +1,58 @@
+{% extends "workspace/base.html" %}
+
+{% block title %}{{ form_title }} — CivicFlow{% endblock %}
+
+{% block extra_head %}
+  {{ form.media.css }}
+{% endblock %}
+
+{% block workspace_content %}
+  <div class="page-header page-header-form">
+    <div>
+      <p class="eyebrow">{{ eyebrow }}</p>
+      <h1>{{ form_title }}</h1>
+      <p>{{ form_intro }}</p>
+    </div>
+  </div>
+
+  <section class="data-panel entity-form-panel">
+    <form method="post" class="entity-form" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="form-errors" role="alert">
+          {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+
+      {% for field in form %}
+        <div class="form-field{% if field.field.widget.input_type == 'checkbox' %} form-field-checkbox{% endif %}{% if field.name == 'boundary' %} form-field-map{% endif %}">
+          {% if field.field.widget.input_type == "checkbox" %}
+            {{ field }}
+            {{ field.label_tag }}
+          {% else %}
+            <div class="label-row">
+              {{ field.label_tag }}
+              {% if field.field.required %}<span>Required</span>{% else %}<span>Optional</span>{% endif %}
+            </div>
+            {{ field }}
+          {% endif %}
+          {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
+          {% if field.errors %}
+            <div class="field-errors" role="alert">
+              {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="form-actions">
+        <button class="button button-primary" type="submit">{{ submit_label }}</button>
+        <a class="button button-secondary" href="{% url cancel_url_name %}">Cancel</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+
+{% block extra_scripts %}
+  {{ form.media.js }}
+{% endblock %}

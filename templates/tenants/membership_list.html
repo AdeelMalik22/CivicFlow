@@ -9,7 +9,7 @@
       <h1>Tenant memberships</h1>
       <p>Controlled relationships between CivicFlow accounts and government organizations.</p>
     </div>
-    <a class="button button-primary" href="{% url 'admin:tenants_tenantmembership_add' %}">
+    <a class="button button-primary" href="{% url 'tenants:membership-add' %}">
       Add membership
     </a>
   </div>
@@ -86,7 +86,7 @@
                   {% endif %}
                 </td>
                 <td class="table-action">
-                  <a href="{% url 'admin:tenants_tenantmembership_change' membership.pk %}">
+                  <a href="{% url 'tenants:membership-edit' membership.pk %}">
                     Manage<span class="sr-only"> {{ membership.user.email }}</span>
                   </a>
                 </td>
@@ -102,7 +102,7 @@
         </span>
         <h3>No tenant memberships</h3>
         <p>Connect an existing CivicFlow account to an organization before assigning roles.</p>
-        <a class="button button-primary" href="{% url 'admin:tenants_tenantmembership_add' %}">
+        <a class="button button-primary" href="{% url 'tenants:membership-add' %}">
           Add first membership
         </a>
       </div>

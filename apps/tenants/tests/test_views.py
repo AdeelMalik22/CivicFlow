@@ -154,3 +154,115 @@ def test_staff_can_view_membership_directory(client: Client):
     assert response.context["active_membership_count"] == 1
     assert response.context["invited_membership_count"] == 0
     assert response.context["tenant_count"] == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url_name",
+    ("tenants:add", "tenants:service-area-add", "tenants:membership-add"),
+)
+def test_entity_forms_require_staff(client: Client, url_name: str):
+    user = User.objects.create_user(email="citizen@example.com")
+    client.force_login(user)
+
+    assert client.get(reverse(url_name)).status_code == 403
+
+
+@pytest.mark.django_db
+def test_staff_can_add_and_edit_organization_in_workspace(client: Client):
+    staff = User.objects.create_user(email="staff@example.com", is_staff=True)
+    client.force_login(staff)
+
+    response = client.post(
+        reverse("tenants:add"),
+        {
+            "name": "City Services",
+            "slug": "City-Services",
+            "status": Tenant.Status.ACTIVE,
+            "timezone": "Asia/Karachi",
+            "default_language": "en",
+            "contact_email": "contact@example.com",
+        },
+    )
+
+    tenant = Tenant.objects.get()
+    assert response.status_code == 302
+    assert response.url == reverse("tenants:list")
+    assert tenant.slug == "city-services"
+    list_page = client.get(reverse("tenants:list")).content.decode()
+    assert reverse("tenants:edit", args=(tenant.pk,)) in list_page
+
+
+@pytest.mark.django_db
+def test_staff_can_add_membership_and_inviter_is_recorded(client: Client):
+    staff = User.objects.create_user(email="staff@example.com", is_staff=True)
+    member = User.objects.create_user(email="member@example.com")
+    tenant = Tenant.objects.create(name="City Services", slug="city-services")
+    client.force_login(staff)
+
+    response = client.post(
+        reverse("tenants:membership-add"),
+        {"tenant": tenant.pk, "user": member.pk, "status": TenantMembership.Status.INVITED},
+    )
+
+    membership = TenantMembership.objects.get()
+    assert response.status_code == 302
+    assert membership.invited_by == staff
+
+
+@pytest.mark.django_db
+def test_staff_can_add_service_area_with_map_boundary(client: Client):
+    staff = User.objects.create_user(email="staff@example.com", is_staff=True)
+    tenant = Tenant.objects.create(
+        name="City Services",
+        slug="city-services",
+        status=Tenant.Status.ACTIVE,
+    )
+    client.force_login(staff)
+
+    form_page = client.get(reverse("tenants:service-area-add"))
+    assert form_page.status_code == 200
+    assert b'id="id_boundary_map"' in form_page.content
+    assert b"OLMapWidget.js" in form_page.content
+
+    response = client.post(
+        reverse("tenants:service-area-add"),
+        {
+            "tenant": tenant.pk,
+            "name": "Central District",
+            "code": "central",
+            "description": "Central service boundary",
+            "boundary": "MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)))",
+            "is_active": "on",
+        },
+    )
+
+    area = ServiceArea.objects.get()
+    assert response.status_code == 302
+    assert response.url == reverse("tenants:service-area-list")
+    assert area.code == "CENTRAL"
+    assert area.boundary.srid == 4326
+
+
+@pytest.mark.django_db
+def test_operational_lists_do_not_link_to_django_admin(client: Client):
+    staff = User.objects.create_user(email="staff@example.com", is_staff=True)
+    tenant = Tenant.objects.create(name="City Services", slug="city-services")
+    member = User.objects.create_user(email="member@example.com")
+    TenantMembership.objects.create(tenant=tenant, user=member)
+    boundary = MultiPolygon(Polygon.from_bbox((0, 0, 1, 1)), srid=4326)
+    ServiceArea.objects.create(
+        tenant=tenant,
+        name="Central",
+        code="CENTRAL",
+        boundary=boundary,
+    )
+    client.force_login(staff)
+
+    for url_name in (
+        "tenants:list",
+        "tenants:service-area-list",
+        "tenants:membership-list",
+    ):
+        response = client.get(reverse(url_name))
+        assert b"/admin/tenants/" not in response.content

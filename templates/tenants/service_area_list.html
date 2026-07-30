@@ -9,7 +9,7 @@
       <h1>Service areas</h1>
       <p>Map-supported boundaries used to validate and route infrastructure reports.</p>
     </div>
-    <a class="button button-primary" href="{% url 'admin:tenants_servicearea_add' %}">
+    <a class="button button-primary" href="{% url 'tenants:service-area-add' %}">
       Add service area
     </a>
   </div>
@@ -87,7 +87,7 @@
                 </td>
                 <td>{{ area.boundary.num_geom }} polygon{{ area.boundary.num_geom|pluralize }}</td>
                 <td class="table-action">
-                  <a href="{% url 'admin:tenants_servicearea_change' area.pk %}">
+                  <a href="{% url 'tenants:service-area-edit' area.pk %}">
                     Manage<span class="sr-only"> {{ area.name }}</span>
                   </a>
                 </td>
@@ -103,7 +103,7 @@
         </span>
         <h3>No service areas configured</h3>
         <p>Add a boundary before accepting location-based reports for an organization.</p>
-        <a class="button button-primary" href="{% url 'admin:tenants_servicearea_add' %}">
+        <a class="button button-primary" href="{% url 'tenants:service-area-add' %}">
           Add first service area
         </a>
       </div>
