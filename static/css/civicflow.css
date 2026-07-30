@@ -149,6 +149,8 @@ button{cursor:pointer}
 .public-nav .account-menu > summary::-webkit-details-marker{display:none}
 .public-nav .account-menu{margin-right:0!important}
 .feed-row .btn-secondary{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.signup-page .form-group input,.signup-page .form-group select,.signup-page .form-group textarea{display:block;width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:12px 14px;font:inherit}
+.signup-page .form-group input:focus,.signup-page .form-group select:focus,.signup-page .form-group textarea:focus{outline:3px solid color-mix(in srgb,var(--accent) 20%,transparent);border-color:var(--accent)}
 @media(prefers-color-scheme:dark){
   .directory-summary,.data-panel,.data-table,.data-table thead,.data-table tbody tr,.data-table td,.data-table th{background:var(--surface);color:var(--ink);border-color:var(--line)}
   .data-panel-header p,.muted-value,.data-table span{color:var(--muted)}

@@ -1,5 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Create account — CivicFlow{% endblock %}
+{% block title %}Create citizen account — CivicFlow{% endblock %}
 {% block content %}
-<section class="sign-in-section"><div class="container sign-in-layout"><div class="sign-in-context"><p class="eyebrow eyebrow-light">CivicFlow account</p><h1>Stay connected to your community.</h1><p>Create a citizen account to report issues and follow their progress in the app.</p></div><div class="auth-card"><div class="auth-heading"><p class="eyebrow">Create account</p><h2>Join CivicFlow</h2><p>Department staff accounts are created by an organization administrator through an invitation.</p></div><form method="post" class="auth-form">{% csrf_token %}{% for field in form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<p class="field-errors">{{ error }}</p>{% endfor %}</div>{% endfor %}<button class="button button-primary button-block" type="submit">Create account</button></form><div class="auth-support"><p>Already registered? <a href="{% url 'login' %}">Sign in</a>.</p></div></div></div></section>
+<section class="section signup-page" style="max-width:760px;margin:auto">
+  <div class="eyebrow">Citizen account</div>
+  <h1 style="font-size:58px;letter-spacing:-.06em">Track reports without exposing your identity.</h1>
+  <p class="lead">Your account keeps report history, updates and verification requests in one private place.</p>
+
+  <div class="panel" style="margin-top:34px">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<span class="help">{{ field.help_text }}</span>{% endif %}
+          {% for error in field.errors %}<span class="help" style="color:var(--danger)">{{ error }}</span>{% endfor %}
+        </div>
+      {% endfor %}
+      <button class="btn btn-primary" style="width:100%" type="submit">Create secure account</button>
+    </form>
+    <p class="help" style="margin-top:18px">Already registered? <a href="{% url 'login' %}">Sign in</a>.</p>
+  </div>
+</section>
 {% endblock %}
