@@ -38,6 +38,18 @@ body { background: var(--ds-bg); color: var(--ds-text); font-family: var(--ds-fo
 .section-heading h2, .accountability-grid h2 { letter-spacing: -.045em; font-size: clamp(2rem, 4vw, 3.5rem); }
 .feature-card, .action-card { padding: 1.75rem; transition: transform .2s ease, box-shadow .2s ease; }
 .feature-card:hover, .action-card:hover { transform: translateY(-4px); box-shadow: var(--ds-shadow-lg); }
+.workspace-content { max-width: 88rem; margin: 0 auto; padding: 2.5rem clamp(1.25rem, 4vw, 4rem); }
+.workspace-content .page-header { margin-bottom: 2rem; }
+.workspace-content .page-header h1 { font-size: clamp(2rem, 4vw, 3.75rem); letter-spacing: -.06em; }
+.workspace-content .workspace-card, .workspace-content .readiness-panel { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--ds-surface); box-shadow: var(--ds-shadow-sm); }
+.workspace-content .workspace-card { padding: clamp(1.25rem, 3vw, 2rem); }
+.workspace-content .workspace-card-header { border-bottom: 1px solid var(--ds-line); padding-bottom: 1rem; margin-bottom: 1.25rem; }
+.workspace-content .workspace-card-header h2 { letter-spacing: -.035em; }
+.workspace-content .readiness-panel { display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+.workspace-content .readiness-panel h2 { margin: .2rem 0; font-size: 1.1rem; }
+.workspace-content .workspace-grid { gap: 1.5rem; }
+.workspace-content .tenant-switch-option { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md); background: var(--ds-surface); transition: border .16s ease, transform .16s ease; }
+.workspace-content .tenant-switch-option:hover, .workspace-content .tenant-switch-option.is-active { border-color: var(--ds-brand); transform: translateY(-2px); }
 a { color: var(--ds-brand); }
 .button { border-radius: var(--ds-radius-sm); font-weight: 650; box-shadow: none; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
 .button:hover { transform: translateY(-1px); box-shadow: var(--ds-shadow-sm); }
