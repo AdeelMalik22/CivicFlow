@@ -4,6 +4,7 @@
 {% block content %}
   <section class="citizen-form-section"><div class="container citizen-form-layout">
     <div class="citizen-form-main">
+      <div class="report-progress" aria-label="Report progress"><span class="is-active">1 <small>Issue</small></span><i></i><span>2 <small>Location</small></span><i></i><span>3 <small>Evidence</small></span><i></i><span>4 <small>Contact</small></span></div>
       <p class="eyebrow">Citizen reporting</p><h1>Report an infrastructure issue</h1><p class="citizen-form-intro">Tell the responsible public team what needs attention. It takes a few minutes.</p>
       <form method="post" enctype="multipart/form-data" class="citizen-report-form" novalidate>{% csrf_token %}
         {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}

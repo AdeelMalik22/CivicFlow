@@ -50,6 +50,13 @@ body { background: var(--ds-bg); color: var(--ds-text); font-family: var(--ds-fo
 .workspace-content .workspace-grid { gap: 1.5rem; }
 .workspace-content .tenant-switch-option { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-md); background: var(--ds-surface); transition: border .16s ease, transform .16s ease; }
 .workspace-content .tenant-switch-option:hover, .workspace-content .tenant-switch-option.is-active { border-color: var(--ds-brand); transform: translateY(-2px); }
+.report-progress { display: flex; align-items: center; gap: .75rem; margin-bottom: 2rem; color: var(--ds-muted); font-size: .8rem; font-weight: 700; }
+.report-progress span { display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap; }
+.report-progress .is-active { color: var(--ds-brand); }
+.report-progress i { height: 1px; flex: 1; background: var(--ds-line); }
+.report-progress small { font-size: .75rem; font-weight: 600; }
+.citizen-form-card input[type=file] { border: 1px dashed var(--ds-brand); background: rgb(99 91 255 / 5%); padding: 1.25rem; }
+@media (max-width: 640px) { .report-progress small { display: none; } .report-progress { gap: .35rem; } }
 a { color: var(--ds-brand); }
 .button { border-radius: var(--ds-radius-sm); font-weight: 650; box-shadow: none; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
 .button:hover { transform: translateY(-1px); box-shadow: var(--ds-shadow-sm); }
