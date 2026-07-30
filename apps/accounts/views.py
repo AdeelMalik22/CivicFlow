@@ -1,11 +1,22 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Count, Q, QuerySet
-from django.urls import reverse_lazy
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
-from .forms import SeparationOfDutiesPolicyForm, TenantRoleForm
-from .models import SeparationOfDutiesPolicy, TenantRole
+from .forms import (
+    InvitationSetPasswordForm,
+    SeparationOfDutiesPolicyForm,
+    TenantRoleForm,
+)
+from .models import SeparationOfDutiesPolicy, StaffInvitation, TenantRole
+from .services import InvitationError, accept_staff_invitation
 
 
 class PlatformStaffRequiredMixin(UserPassesTestMixin):
@@ -79,3 +90,74 @@ class SeparationPolicyCreateView(SeparationPolicyFormMixin, CreateView):
 
 class SeparationPolicyUpdateView(SeparationPolicyFormMixin, UpdateView):
     success_message = "Separation-of-duties policy updated."
+
+
+class StaffInvitationAcceptView(View):
+    template_name = "accounts/invitation_accept.html"
+
+    def get(self, request, public_id, uidb64, token):
+        invitation = self._invitation(public_id, uidb64)
+        if not self._is_valid(invitation, token):
+            return render(request, self.template_name, {"invalid": True}, status=400)
+        form = (
+            InvitationSetPasswordForm(invitation.membership.user)
+            if not invitation.membership.user.has_usable_password()
+            else None
+        )
+        return render(
+            request,
+            self.template_name,
+            {"invitation": invitation, "form": form},
+        )
+
+    def post(self, request, public_id, uidb64, token):
+        invitation = self._invitation(public_id, uidb64)
+        if not self._is_valid(invitation, token):
+            return render(request, self.template_name, {"invalid": True}, status=400)
+
+        user = invitation.membership.user
+        form = (
+            InvitationSetPasswordForm(user, request.POST)
+            if not user.has_usable_password()
+            else None
+        )
+        if form is not None and not form.is_valid():
+            return render(
+                request,
+                self.template_name,
+                {"invitation": invitation, "form": form},
+            )
+
+        try:
+            accept_staff_invitation(
+                invitation,
+                token=token,
+                raw_password=form.cleaned_data["new_password1"] if form else None,
+            )
+        except InvitationError:
+            return render(request, self.template_name, {"invalid": True}, status=400)
+
+        messages.success(request, "Your CivicFlow membership is now active.")
+        return redirect(f"{reverse('login')}?next={reverse('workspace')}")
+
+    @staticmethod
+    def _invitation(public_id, uidb64) -> StaffInvitation:
+        invitation = get_object_or_404(
+            StaffInvitation.objects.select_related("membership__user", "membership__tenant"),
+            public_id=public_id,
+        )
+        try:
+            user_id = force_str(urlsafe_base64_decode(uidb64))
+        except (ValueError, TypeError, UnicodeDecodeError) as exc:
+            raise Http404 from exc
+        if str(invitation.membership.user_id) != user_id:
+            raise Http404
+        return invitation
+
+    @staticmethod
+    def _is_valid(invitation: StaffInvitation, token: str) -> bool:
+        return (
+            invitation.is_pending
+            and invitation.membership.status == invitation.membership.Status.INVITED
+            and default_token_generator.check_token(invitation.membership.user, token)
+        )

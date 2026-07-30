@@ -85,6 +85,18 @@
               Roles &amp; policies
             </a>
           {% endif %}
+          {% if can_administer_tenant %}
+            <a
+              class="workspace-nav-item{% if request.resolver_match.namespace == 'tenant-admin' %} is-active{% endif %}"
+              href="{% url 'tenant-admin:dashboard' %}"
+              {% if request.resolver_match.namespace == 'tenant-admin' %}aria-current="page"{% endif %}
+            >
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3Zm0 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm-4 9.2c1.1-1.4 2.4-2.2 4-2.2s2.9.8 4 2.2c-1 1.8-2.4 3.2-4 3.9-1.6-.7-3-2.1-4-3.9Z"/></svg>
+              </span>
+              Administration
+            </a>
+          {% endif %}
           <span class="workspace-nav-heading">Product modules</span>
           <span class="workspace-nav-item is-disabled" aria-disabled="true">
             <span class="nav-icon" aria-hidden="true">

@@ -1,0 +1,13 @@
+{% extends "workspace/base.html" %}
+{% block title %}Organization settings — CivicFlow{% endblock %}
+{% block workspace_content %}
+  <nav class="form-breadcrumb"><a href="{% url 'tenant-admin:dashboard' %}"><span>←</span> Administration</a></nav>
+  <form method="post" class="entity-form" novalidate>{% csrf_token %}
+    <div class="form-primary-surface role-form-surface">
+      <div class="page-header form-page-header"><div><p class="eyebrow">Tenant configuration</p><h1>Organization settings</h1><p>Regional and communication defaults for this organization.</p></div><span class="form-mode-badge">Tenant scoped</span></div>
+      {% if form.non_field_errors %}<div class="form-errors role-form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      <section class="form-card"><div class="form-grid form-grid-two">{% include "tenants/includes/form_field.html" with field=form.name %}{% include "tenants/includes/form_field.html" with field=form.timezone %}{% include "tenants/includes/form_field.html" with field=form.default_language %}{% include "tenants/includes/form_field.html" with field=form.contact_email %}</div></section>
+      <div class="form-action-bar"><p><strong>Organization settings</strong><span>The tenant slug and lifecycle status remain platform-controlled.</span></p><div><a class="button button-secondary" href="{% url 'tenant-admin:dashboard' %}">Cancel</a><button class="button button-primary" type="submit">Save settings</button></div></div>
+    </div>
+  </form>
+{% endblock %}

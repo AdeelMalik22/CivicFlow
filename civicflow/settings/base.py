@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "apps.common",
     "apps.accounts",
     "apps.tenants",
+    "apps.issues",
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.accounts.context_processors.tenant_access",
             ],
         },
     },
@@ -147,6 +149,7 @@ CELERY_TIMEZONE = TIME_ZONE
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "CivicFlow <noreply@civicflow.local>"
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 48
 
 LOGGING = {
     "version": 1,

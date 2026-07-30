@@ -6,6 +6,7 @@ from .models import (
     MembershipRole,
     RolePermission,
     SeparationOfDutiesPolicy,
+    StaffInvitation,
     TenantRole,
     User,
 )
@@ -68,6 +69,28 @@ class MembershipRoleAdmin(admin.ModelAdmin):
 class SeparationOfDutiesPolicyAdmin(admin.ModelAdmin):
     list_display = ("name", "tenant", "initiator_permission", "approver_permission", "is_active")
     list_filter = ("tenant", "is_active")
+
+
+@admin.register(StaffInvitation)
+class StaffInvitationAdmin(admin.ModelAdmin):
+    list_display = ("email", "membership", "invited_by", "sent_at", "accepted_at", "revoked_at")
+    list_filter = ("sent_at", "accepted_at", "revoked_at")
+    search_fields = ("email", "membership__tenant__name")
+    readonly_fields = (
+        "public_id",
+        "membership",
+        "email",
+        "invited_by",
+        "sent_at",
+        "accepted_at",
+        "revoked_at",
+    )
+
+    def has_add_permission(self, request) -> bool:
+        return False
+
+    def has_delete_permission(self, request, obj=None) -> bool:
+        return False
     add_fieldsets = (
         (
             None,

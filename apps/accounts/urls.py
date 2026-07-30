@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     SeparationPolicyCreateView,
     SeparationPolicyUpdateView,
+    StaffInvitationAcceptView,
     TenantRoleCreateView,
     TenantRoleListView,
     TenantRoleUpdateView,
@@ -11,6 +12,11 @@ from .views import (
 app_name = "accounts"
 
 urlpatterns = [
+    path(
+        "invitations/<uuid:public_id>/<uidb64>/<token>/",
+        StaffInvitationAcceptView.as_view(),
+        name="invitation-accept",
+    ),
     path("roles/", TenantRoleListView.as_view(), name="role-list"),
     path("roles/add/", TenantRoleCreateView.as_view(), name="role-add"),
     path("roles/<int:pk>/edit/", TenantRoleUpdateView.as_view(), name="role-edit"),

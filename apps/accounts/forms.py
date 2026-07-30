@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import SetPasswordForm
 
 from .models import (
     AccessPermission,
@@ -78,3 +79,16 @@ class SeparationOfDutiesPolicyForm(forms.ModelForm):
         queryset = AccessPermission.objects.order_by("name")
         self.fields["initiator_permission"].queryset = queryset
         self.fields["approver_permission"].queryset = queryset.filter(is_sensitive=True)
+
+
+class InvitationSetPasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label="Create password",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+    )
+    new_password2 = forms.CharField(
+        label="Confirm password",
+        strip=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+    )

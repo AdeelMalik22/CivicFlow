@@ -8,6 +8,13 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
+from apps.accounts.services import (
+    InvitationError,
+    activate_membership,
+    issue_staff_invitation,
+    suspend_membership,
+)
+
 from .forms import ServiceAreaForm, TenantForm, TenantMembershipForm
 from .models import ServiceArea, Tenant, TenantMembership
 from .request import activate_tenant
@@ -171,12 +178,12 @@ class TenantMembershipCreateView(EntityFormMixin, CreateView):
     model = TenantMembership
     form_class = TenantMembershipForm
     success_url = reverse_lazy("tenants:membership-list")
-    success_message = "Membership added."
+    success_message = "Staff invitation created."
     extra_context = {
         "eyebrow": "Identity administration",
-        "form_title": "Add membership",
-        "form_intro": "Connect an existing CivicFlow account to an organization.",
-        "submit_label": "Add membership",
+        "form_title": "Invite staff member",
+        "form_intro": "Invite an account into an organization and assign its initial roles.",
+        "submit_label": "Send invitation",
         "cancel_url_name": "tenants:membership-list",
         "form_variant": "membership",
     }
@@ -184,7 +191,15 @@ class TenantMembershipCreateView(EntityFormMixin, CreateView):
     def form_valid(self, form):
         if form.instance._state.adding:
             form.instance.invited_by = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        if self.object.status == TenantMembership.Status.INVITED:
+            issue_staff_invitation(
+                self.object,
+                invited_by=self.request.user,
+                build_absolute_uri=self.request.build_absolute_uri,
+            )
+            messages.success(self.request, "Invitation email queued for delivery.")
+        return response
 
 
 class TenantMembershipUpdateView(EntityFormMixin, UpdateView):
@@ -197,3 +212,43 @@ class TenantMembershipUpdateView(EntityFormMixin, UpdateView):
         "form_title": "Edit membership",
         "submit_label": "Save changes",
     }
+
+
+class MembershipLifecycleView(StaffRequiredMixin, View):
+    action = ""
+
+    def post(self, request, pk):
+        membership = get_object_or_404(
+            TenantMembership.objects.select_related("tenant", "user"),
+            pk=pk,
+        )
+        if self.action == "suspend":
+            suspend_membership(membership)
+            messages.success(request, f"{membership.user} was suspended.")
+        elif self.action == "activate":
+            activate_membership(membership)
+            messages.success(request, f"{membership.user} was activated.")
+        elif self.action == "resend":
+            try:
+                issue_staff_invitation(
+                    membership,
+                    invited_by=request.user,
+                    build_absolute_uri=request.build_absolute_uri,
+                )
+            except InvitationError as error:
+                messages.error(request, error.message)
+            else:
+                messages.success(request, f"Invitation resent to {membership.user.email}.")
+        return HttpResponseRedirect(reverse_lazy("tenants:membership-list"))
+
+
+class MembershipSuspendView(MembershipLifecycleView):
+    action = "suspend"
+
+
+class MembershipActivateView(MembershipLifecycleView):
+    action = "activate"
+
+
+class MembershipResendInvitationView(MembershipLifecycleView):
+    action = "resend"

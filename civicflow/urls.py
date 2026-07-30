@@ -34,6 +34,8 @@ urlpatterns = [
         include("apps.tenants.urls"),
     ),
     path("workspace/access/", include("apps.accounts.urls")),
+    path("workspace/administration/", include("apps.tenants.admin_urls")),
+    path("", include("apps.issues.urls")),
     path(
         "sign-in/",
         auth_views.LoginView.as_view(template_name="registration/login.html"),

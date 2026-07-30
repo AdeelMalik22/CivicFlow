@@ -95,7 +95,11 @@
                 {% include "tenants/includes/form_field.html" with field=form.last_name %}
               </div>
               {% include "tenants/includes/form_field.html" with field=form.tenant %}
-              {% include "tenants/includes/form_field.html" with field=form.status %}
+              <div class="membership-lifecycle-preview">
+                <span>Membership status</span>
+                <strong>{% if object %}{{ object.get_status_display }}{% else %}Invited{% endif %}</strong>
+                <p>{% if object %}Use the lifecycle actions on the membership directory to change access.{% else %}The member receives a secure email link before access becomes active.{% endif %}</p>
+              </div>
               <div class="form-field">
                 <div class="label-row">{{ form.roles.label_tag }}<span>Optional</span></div>
                 <div class="permission-choice-grid">{{ form.roles }}</div>

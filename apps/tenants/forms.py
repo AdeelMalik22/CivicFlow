@@ -4,7 +4,7 @@ from django.contrib.gis.forms import OSMWidget
 
 from apps.accounts.models import MembershipRole, TenantRole
 
-from .models import ServiceArea, Tenant, TenantMembership
+from .models import Department, ServiceArea, Tenant, TenantMembership
 
 User = get_user_model()
 
@@ -32,6 +32,31 @@ class TenantForm(forms.ModelForm):
             "name": "The official public name of the government organization.",
             "default_language": "BCP 47 language code used for tenant defaults, such as en.",
             "contact_email": "Operational contact address; it is not displayed publicly.",
+        }
+
+
+class TenantSettingsForm(forms.ModelForm):
+    class Meta:
+        model = Tenant
+        fields = ("name", "timezone", "default_language", "contact_email")
+        widgets = {
+            "name": forms.TextInput(attrs={"autocomplete": "organization"}),
+            "timezone": forms.TextInput(attrs={"placeholder": "Asia/Karachi"}),
+            "default_language": forms.TextInput(attrs={"placeholder": "en"}),
+            "contact_email": forms.EmailInput(attrs={"autocomplete": "email"}),
+        }
+
+
+class DepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = ("name", "code", "description", "is_active")
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "Roads and maintenance"}),
+            "code": forms.TextInput(attrs={"placeholder": "ROADS", "spellcheck": "false"}),
+            "description": forms.Textarea(
+                attrs={"rows": 4, "placeholder": "Describe this department's responsibility."}
+            ),
         }
 
 
@@ -92,10 +117,9 @@ class TenantMembershipForm(forms.ModelForm):
 
     class Meta:
         model = TenantMembership
-        fields = ("tenant", "status")
+        fields = ("tenant",)
         help_texts = {
             "tenant": "The organization this account may access.",
-            "status": "Roles and department permissions are assigned separately.",
         }
 
     def __init__(self, *args, **kwargs) -> None:
@@ -112,6 +136,7 @@ class TenantMembershipForm(forms.ModelForm):
             tenant_field.disabled = True
 
         if self.instance.pk:
+            tenant_field.disabled = True
             self.fields["email"].initial = self.instance.user.email
             self.fields["first_name"].initial = self.instance.user.first_name
             self.fields["last_name"].initial = self.instance.user.last_name

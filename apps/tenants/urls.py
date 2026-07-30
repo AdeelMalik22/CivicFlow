@@ -1,6 +1,9 @@
 from django.urls import path
 
 from .views import (
+    MembershipActivateView,
+    MembershipResendInvitationView,
+    MembershipSuspendView,
     ServiceAreaCreateView,
     ServiceAreaListView,
     ServiceAreaUpdateView,
@@ -29,5 +32,20 @@ urlpatterns = [
         "memberships/<int:pk>/edit/",
         TenantMembershipUpdateView.as_view(),
         name="membership-edit",
+    ),
+    path(
+        "memberships/<int:pk>/suspend/",
+        MembershipSuspendView.as_view(),
+        name="membership-suspend",
+    ),
+    path(
+        "memberships/<int:pk>/activate/",
+        MembershipActivateView.as_view(),
+        name="membership-activate",
+    ),
+    path(
+        "memberships/<int:pk>/resend/",
+        MembershipResendInvitationView.as_view(),
+        name="membership-resend",
     ),
 ]

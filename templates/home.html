@@ -13,7 +13,7 @@
           through verified completion—all through one trusted public record.
         </p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#citizen-services">Explore citizen services</a>
+          <a class="button button-primary" href="{% url 'issues:report' %}">Report an issue</a>
           <a class="button button-ghost" href="#how-it-works">See how it works</a>
         </div>
         <ul class="trust-list" aria-label="CivicFlow service principles">
@@ -120,14 +120,14 @@
       <article class="action-card">
         <p class="eyebrow">For citizens</p>
         <h2>Report a local issue</h2>
-        <p>A guided, accessible report flow is being prepared for the CivicFlow pilot.</p>
-        <span class="coming-soon">Pilot service in development</span>
+        <p>Describe the issue, pinpoint its location, and receive a private reference for updates.</p>
+        <a class="button button-primary button-small" href="{% url 'issues:report' %}">Start a report</a>
       </article>
       <article class="action-card">
         <p class="eyebrow">Public tracking</p>
         <h2>Follow a report</h2>
-        <p>Reference-based tracking will show useful progress while protecting personal information.</p>
-        <span class="coming-soon">Pilot service in development</span>
+        <p>Use your report reference and private verification code to follow safe progress updates.</p>
+        <a class="button button-secondary button-small" href="{% url 'issues:track-lookup' %}">Track a report</a>
       </article>
     </div>
   </section>

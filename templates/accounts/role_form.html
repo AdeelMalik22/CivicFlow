@@ -3,7 +3,7 @@
 {% block title %}{% if object %}Edit role{% else %}Add role{% endif %} — CivicFlow{% endblock %}
 
 {% block workspace_content %}
-  <nav class="form-breadcrumb" aria-label="Breadcrumb"><a href="{% url 'accounts:role-list' %}"><span aria-hidden="true">←</span> Roles and permissions</a></nav>
+  <nav class="form-breadcrumb" aria-label="Breadcrumb"><a href="{% if cancel_url_name %}{% url cancel_url_name %}{% else %}{% url 'accounts:role-list' %}{% endif %}"><span aria-hidden="true">←</span> Roles and permissions</a></nav>
   <form method="post" class="entity-form" novalidate>
     {% csrf_token %}
     <div class="form-primary-surface role-form-surface">
@@ -35,7 +35,7 @@
       </section>
       <div class="form-action-bar">
         <p><strong>{% if object %}Update{% else %}Create{% endif %} role</strong><span>Changes affect every member assigned to this role.</span></p>
-        <div><a class="button button-secondary" href="{% url 'accounts:role-list' %}">Cancel</a><button class="button button-primary" type="submit">{% if object %}Save changes{% else %}Add role{% endif %}</button></div>
+        <div><a class="button button-secondary" href="{% if cancel_url_name %}{% url cancel_url_name %}{% else %}{% url 'accounts:role-list' %}{% endif %}">Cancel</a><button class="button button-primary" type="submit">{% if object %}Save changes{% else %}Add role{% endif %}</button></div>
       </div>
     </div>
   </form>

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Accept invitation — CivicFlow{% endblock %}
+
+{% block content %}
+  <section class="invitation-section">
+    <div class="container">
+      <div class="invitation-card">
+        {% if invalid %}
+          <span class="invitation-icon invitation-icon-error" aria-hidden="true">!</span>
+          <p class="eyebrow">Invitation unavailable</p>
+          <h1>This invitation cannot be used</h1>
+          <p>The link may have expired, been replaced, or the membership may no longer be awaiting activation.</p>
+          <a class="button button-primary" href="{% url 'login' %}">Go to staff sign in</a>
+        {% else %}
+          <span class="invitation-icon" aria-hidden="true">✓</span>
+          <p class="eyebrow">Staff invitation</p>
+          <h1>Join {{ invitation.membership.tenant.name }}</h1>
+          <p>
+            You were invited to access this organization using
+            <strong>{{ invitation.email }}</strong>.
+          </p>
+          <form method="post" class="invitation-form" novalidate>
+            {% csrf_token %}
+            {% if form %}
+              <div class="invitation-password-fields">
+                {% for field in form %}
+                  <div class="form-field">
+                    <div class="label-row">{{ field.label_tag }}<span>Required</span></div>
+                    {{ field }}
+                    {% if field.help_text %}<div class="field-help">{{ field.help_text|safe }}</div>{% endif %}
+                    {% if field.errors %}<div class="field-errors" role="alert">{{ field.errors }}</div>{% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+              <button class="button button-primary" type="submit">Set password and join</button>
+            {% else %}
+              <div class="existing-account-notice">
+                <strong>Your account already exists</strong>
+                <p>Accepting adds this organization to your existing CivicFlow account.</p>
+              </div>
+              <button class="button button-primary" type="submit">Accept invitation</button>
+            {% endif %}
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}

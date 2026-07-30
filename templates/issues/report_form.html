@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Report an issue — CivicFlow{% endblock %}
+{% block extra_head %}{{ form.media.css }}{% endblock %}
+{% block content %}
+  <section class="citizen-form-section"><div class="container citizen-form-layout">
+    <div class="citizen-form-main">
+      <p class="eyebrow">Citizen reporting</p><h1>Report an infrastructure issue</h1><p class="citizen-form-intro">Tell the responsible public team what needs attention. It takes a few minutes.</p>
+      <form method="post" enctype="multipart/form-data" class="citizen-report-form" novalidate>{% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+        <section class="citizen-form-card"><div class="citizen-form-card-heading"><span>01</span><div><h2>What happened?</h2><p>Give the public team enough context to understand the issue.</p></div></div>{% include "issues/includes/field.html" with field=form.category %}{% include "issues/includes/field.html" with field=form.description %}</section>
+        <section class="citizen-form-card"><div class="citizen-form-card-heading"><span>02</span><div><h2>Where is it?</h2><p>We use the location to route your report to the right organization.</p></div></div>{% include "issues/includes/field.html" with field=form.service_area %}{% include "issues/includes/field.html" with field=form.location %}</section>
+        <section class="citizen-form-card"><div class="citizen-form-card-heading"><span>03</span><div><h2>Add evidence</h2><p>Photos help the responsible team understand the issue.</p></div></div>{% include "issues/includes/field.html" with field=form.attachments %}</section>
+        <section class="citizen-form-card"><div class="citizen-form-card-heading"><span>04</span><div><h2>Stay informed</h2><p>Contact details stay private and are never shown on the public timeline.</p></div></div><div class="citizen-form-grid">{% include "issues/includes/field.html" with field=form.contact_preference %}{% include "issues/includes/field.html" with field=form.contact_email %}</div></section>
+        <div class="citizen-form-actions"><a class="button button-secondary" href="{% url 'home' %}">Cancel</a><button class="button button-primary" type="submit">Submit report</button></div>
+      </form>
+    </div>
+    <aside class="citizen-form-aside"><div class="citizen-aside-icon">i</div><h2>What happens next?</h2><ol><li><strong>We record your report</strong><span>You receive a reference and private verification code.</span></li><li><strong>A public team reviews it</strong><span>The location routes it to the responsible organization.</span></li><li><strong>You can follow progress</strong><span>Use your reference and code to see safe status updates.</span></li></ol></aside>
+  </div></section>
+{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}{% endblock %}

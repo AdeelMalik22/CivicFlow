@@ -1,0 +1,76 @@
+{% extends "workspace/base.html" %}
+
+{% block title %}Administration — {{ request.tenant.name }}{% endblock %}
+
+{% block workspace_content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Tenant administration</p>
+      <h1>{{ request.tenant.name }}</h1>
+      <p>Manage the people, access policies, departments, and geographic coverage for this organization.</p>
+    </div>
+    {% if can_manage_configuration %}<a class="button button-secondary" href="{% url 'tenant-admin:settings' %}">Organization settings</a>{% endif %}
+  </div>
+
+  <section class="admin-stat-grid" aria-label="Organization summary">
+    <div><span>Members</span><strong>{{ memberships|length }}</strong><small>{{ active_member_count }} active</small></div>
+    <div><span>Roles</span><strong>{{ roles|length }}</strong><small>Tenant scoped</small></div>
+    <div><span>Departments</span><strong>{{ departments|length }}</strong><small>Operational units</small></div>
+    <div><span>Service areas</span><strong>{{ service_areas|length }}</strong><small>Routing boundaries</small></div>
+  </section>
+
+  {% if can_manage_users %}
+    <section class="data-panel admin-section" aria-labelledby="tenant-members-title">
+      <div class="data-panel-header">
+        <div><h2 id="tenant-members-title">Members</h2><p>Invitations, account status, and tenant role assignments.</p></div>
+        <a class="button button-primary button-small" href="{% url 'tenant-admin:membership-add' %}">Invite staff</a>
+      </div>
+      {% if memberships %}
+        <div class="table-scroll"><table class="data-table">
+          <thead><tr><th>Account</th><th>Roles</th><th>Status</th><th>Invited</th><th><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody>{% for membership in memberships %}<tr>
+            <td><div class="entity-cell"><span class="entity-avatar entity-avatar-person">{{ membership.user.email|first|upper }}</span><div><strong>{{ membership.user }}</strong><span>{{ membership.user.email }}</span></div></div></td>
+            <td>{% for assignment in membership.role_assignments.all %}<span class="role-chip">{{ assignment.role.name }}</span>{% empty %}<span class="muted-value">No roles assigned</span>{% endfor %}</td>
+            <td><span class="table-status membership-status-{{ membership.status }}"><span></span>{{ membership.get_status_display }}</span></td>
+            <td>{{ membership.invited_at|date:"d M Y" }}</td>
+            <td class="table-action membership-actions">
+              <a href="{% url 'tenant-admin:membership-edit' membership.pk %}">Manage</a>
+              {% if membership.status == "invited" %}
+                <form method="post" action="{% url 'tenant-admin:membership-resend' membership.pk %}">{% csrf_token %}<button type="submit">Resend</button></form>
+                <form method="post" action="{% url 'tenant-admin:membership-activate' membership.pk %}">{% csrf_token %}<button type="submit">Activate</button></form>
+              {% elif membership.status == "active" %}
+                <form method="post" action="{% url 'tenant-admin:membership-suspend' membership.pk %}">{% csrf_token %}<button class="danger-action" type="submit">Suspend</button></form>
+              {% else %}
+                <form method="post" action="{% url 'tenant-admin:membership-activate' membership.pk %}">{% csrf_token %}<button type="submit">Reactivate</button></form>
+              {% endif %}
+            </td>
+          </tr>{% endfor %}</tbody>
+        </table></div>
+      {% else %}<div class="empty-state compact-empty-state"><h3>No members</h3><p>Invite the first staff member to this organization.</p></div>{% endif %}
+    </section>
+
+    <section class="data-panel admin-section" aria-labelledby="tenant-roles-title">
+      <div class="data-panel-header">
+        <div><h2 id="tenant-roles-title">Roles and access policies</h2><p>Explicit capabilities assigned within this organization.</p></div>
+        <a class="button button-secondary button-small" href="{% url 'tenant-admin:role-add' %}">Add role</a>
+      </div>
+      {% if roles %}<div class="table-scroll"><table class="data-table">
+        <thead><tr><th>Role</th><th>Members</th><th>Capabilities</th><th>MFA</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody>{% for role in roles %}<tr><td><strong>{{ role.name }}</strong><span class="muted-value">{{ role.code }}</span></td><td>{{ role.member_count }}</td><td>{{ role.permission_count }}</td><td>{% if role.requires_mfa %}Required{% else %}Optional{% endif %}</td><td>{% if role.is_active %}Active{% else %}Inactive{% endif %}</td><td class="table-action"><a href="{% url 'tenant-admin:role-edit' role.pk %}">Manage</a></td></tr>{% endfor %}</tbody>
+      </table></div>{% else %}<div class="empty-state compact-empty-state"><h3>No roles</h3><p>Add a role before granting member access.</p></div>{% endif %}
+    </section>
+  {% endif %}
+
+  {% if can_manage_configuration %}
+    <div class="tenant-config-grid">
+      <section class="data-panel admin-section" aria-labelledby="departments-title">
+        <div class="data-panel-header"><div><h2 id="departments-title">Departments</h2><p>Operational ownership units.</p></div><a class="button button-secondary button-small" href="{% url 'tenant-admin:department-add' %}">Add department</a></div>
+        <div class="admin-compact-list">{% for department in departments %}<a href="{% url 'tenant-admin:department-edit' department.pk %}"><span><strong>{{ department.name }}</strong><small>{{ department.code }}</small></span><span class="{% if department.is_active %}status-dot-active{% else %}status-dot-inactive{% endif %}">{% if department.is_active %}Active{% else %}Inactive{% endif %}</span></a>{% empty %}<p>No departments configured.</p>{% endfor %}</div>
+      </section>
+      <section class="data-panel admin-section" aria-labelledby="areas-title">
+        <div class="data-panel-header"><div><h2 id="areas-title">Service areas</h2><p>Geographic report routing.</p></div><a class="button button-secondary button-small" href="{% url 'tenant-admin:service-area-add' %}">Add service area</a></div>
+        <div class="admin-compact-list">{% for area in service_areas %}<a href="{% url 'tenant-admin:service-area-edit' area.pk %}"><span><strong>{{ area.name }}</strong><small>{{ area.code }}</small></span><span class="{% if area.is_active %}status-dot-active{% else %}status-dot-inactive{% endif %}">{% if area.is_active %}Active{% else %}Inactive{% endif %}</span></a>{% empty %}<p>No service areas configured.</p>{% endfor %}</div>
+      </section>
+    </div>
+  {% endif %}
+{% endblock %}

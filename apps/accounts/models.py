@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -202,3 +203,41 @@ class SeparationOfDutiesPolicy(models.Model):
             raise ValidationError(
                 "Initiator and approver permissions must be different capabilities."
             )
+
+
+class StaffInvitation(models.Model):
+    """One auditable delivery attempt for a tenant membership invitation."""
+
+    public_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    membership = models.ForeignKey(
+        "tenants.TenantMembership",
+        on_delete=models.CASCADE,
+        related_name="invitations",
+    )
+    email = models.EmailField()
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="staff_invitations_sent",
+    )
+    sent_at = models.DateTimeField(auto_now_add=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ("-sent_at",)
+        indexes = [
+            models.Index(
+                fields=("membership", "accepted_at", "revoked_at"),
+                name="invite_membership_state_idx",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.email} — {self.membership.tenant.name}"
+
+    @property
+    def is_pending(self) -> bool:
+        return self.accepted_at is None and self.revoked_at is None

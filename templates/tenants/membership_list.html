@@ -10,7 +10,7 @@
       <p>Controlled relationships between CivicFlow accounts and government organizations.</p>
     </div>
     <a class="button button-primary" href="{% url 'tenants:membership-add' %}">
-      Add membership
+      Invite staff
     </a>
   </div>
 
@@ -85,10 +85,28 @@
                     <span class="muted-value">by {{ membership.invited_by }}</span>
                   {% endif %}
                 </td>
-                <td class="table-action">
-                  <a href="{% url 'tenants:membership-edit' membership.pk %}">
-                    Manage<span class="sr-only"> {{ membership.user.email }}</span>
-                  </a>
+                <td class="table-action membership-actions">
+                  <a href="{% url 'tenants:membership-edit' membership.pk %}">Manage<span class="sr-only"> {{ membership.user.email }}</span></a>
+                  {% if membership.status == "invited" %}
+                    <form method="post" action="{% url 'tenants:membership-resend' membership.pk %}">
+                      {% csrf_token %}
+                      <button type="submit">Resend invite<span class="sr-only"> to {{ membership.user.email }}</span></button>
+                    </form>
+                    <form method="post" action="{% url 'tenants:membership-activate' membership.pk %}">
+                      {% csrf_token %}
+                      <button type="submit">Activate<span class="sr-only"> {{ membership.user.email }}</span></button>
+                    </form>
+                  {% elif membership.status == "active" %}
+                    <form method="post" action="{% url 'tenants:membership-suspend' membership.pk %}">
+                      {% csrf_token %}
+                      <button class="danger-action" type="submit">Suspend<span class="sr-only"> {{ membership.user.email }}</span></button>
+                    </form>
+                  {% else %}
+                    <form method="post" action="{% url 'tenants:membership-activate' membership.pk %}">
+                      {% csrf_token %}
+                      <button type="submit">Reactivate<span class="sr-only"> {{ membership.user.email }}</span></button>
+                    </form>
+                  {% endif %}
                 </td>
               </tr>
             {% endfor %}
@@ -103,7 +121,7 @@
         <h3>No tenant memberships</h3>
         <p>Connect an existing CivicFlow account to an organization before assigning roles.</p>
         <a class="button button-primary" href="{% url 'tenants:membership-add' %}">
-          Add first membership
+          Invite first staff member
         </a>
       </div>
     {% endif %}

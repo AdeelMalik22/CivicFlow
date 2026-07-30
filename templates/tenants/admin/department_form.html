@@ -1,0 +1,13 @@
+{% extends "workspace/base.html" %}
+{% block title %}{% if object %}Edit department{% else %}Add department{% endif %} — CivicFlow{% endblock %}
+{% block workspace_content %}
+  <nav class="form-breadcrumb"><a href="{% url 'tenant-admin:dashboard' %}"><span>←</span> Administration</a></nav>
+  <form method="post" class="entity-form" novalidate>{% csrf_token %}
+    <div class="form-primary-surface role-form-surface">
+      <div class="page-header form-page-header"><div><p class="eyebrow">Organization structure</p><h1>{% if object %}Edit department{% else %}Add department{% endif %}</h1><p>Define an operational unit inside {{ request.tenant.name }}.</p></div><span class="form-mode-badge">{% if object %}Editing{% else %}New department{% endif %}</span></div>
+      {% if form.non_field_errors %}<div class="form-errors role-form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      <section class="form-card"><div class="form-grid form-grid-two">{% include "tenants/includes/form_field.html" with field=form.name %}{% include "tenants/includes/form_field.html" with field=form.code %}<div class="form-grid-span">{% include "tenants/includes/form_field.html" with field=form.description %}</div><div class="form-grid-span">{% include "tenants/includes/form_field.html" with field=form.is_active %}</div></div></section>
+      <div class="form-action-bar"><p><strong>Department record</strong><span>Changes apply only to {{ request.tenant.name }}.</span></p><div><a class="button button-secondary" href="{% url 'tenant-admin:dashboard' %}">Cancel</a><button class="button button-primary" type="submit">Save department</button></div></div>
+    </div>
+  </form>
+{% endblock %}
