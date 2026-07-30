@@ -7,20 +7,21 @@
     <meta name="description" content="{% block meta_description %}Track public infrastructure work from report to verified completion.{% endblock %}">
     <title>{% block title %}CivicFlow{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/civicflow.css' %}">
     <link rel="stylesheet" href="{% static 'css/design-system.css' %}">
     {% block extra_head %}{% endblock %}
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
-    <header class="site-header ds-site-header">
-      <div class="container header-inner">
+    <header class="public-nav site-header ds-site-header">
+      <div class="header-inner">
         <a class="brand" href="{% url 'home' %}" aria-label="CivicFlow home">
           <span class="brand-mark" aria-hidden="true">CF</span>
           <span>CivicFlow</span>
         </a>
 
-        <nav class="primary-nav ds-primary-nav" aria-label="Primary navigation">
+        <nav class="nav-links primary-nav ds-primary-nav" aria-label="Primary navigation">
           <a href="{% url 'home' %}#how-it-works">How it works</a>
           <a href="{% url 'home' %}#accountability">Accountability</a>
           {% if request.user.is_authenticated %}

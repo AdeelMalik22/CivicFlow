@@ -139,7 +139,7 @@ class TenantServiceAreaFormMixin(
 ):
     model = ServiceArea
     form_class = ServiceAreaForm
-    template_name = "tenants/entity_form.html"
+    template_name = "tenants/service_area_form.html"
     success_url = reverse_lazy("tenant-admin:dashboard")
     extra_context = {
         "eyebrow": "Tenant administration",

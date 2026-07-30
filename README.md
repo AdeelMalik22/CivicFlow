@@ -67,3 +67,5 @@ docker compose up --build
 ```
 
 The application is available at <http://localhost:8000/>.
+
+DemoPass123!

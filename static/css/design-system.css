@@ -78,6 +78,17 @@ a { color: var(--ds-brand); }
 .auth-form label { color: var(--ds-text); font-weight: 650; }
 .auth-support { border-top: 1px solid var(--ds-line); margin-top: 1.5rem; padding-top: 1.25rem; color: var(--ds-muted); }
 .auth-support a { font-weight: 650; }
+.tracking-section { padding: 4rem 0 6rem; background: var(--ds-bg); }
+.tracking-section > .container > h1 { font-size: clamp(2.25rem, 5vw, 4rem); letter-spacing: -.06em; }
+.tracking-section .auth-card { max-width: 52rem; margin: 0 auto; }
+.tracking-section .auth-form input[type=file] { border: 1px dashed var(--ds-brand); background: rgb(99 91 255 / 5%); padding: 1.25rem; }
+.tracking-card h2 { letter-spacing: -.035em; }
+.tracking-card p { color: var(--ds-muted); line-height: 1.6; }
+.tracking-card + .tracking-card { margin-top: 1rem; }
+.tracking-section .status-badge { display: inline-flex; padding: .35rem .7rem; background: var(--ds-surface-subtle); color: var(--ds-text); }
+.tracking-section form { margin-top: 1rem; }
+.tracking-section form input:not([type=file]), .tracking-section form textarea, .tracking-section form select { width: 100%; }
+.tracking-section .button { margin-top: .5rem; }
 .tracking-card, .auth-card, .citizen-form-card { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: var(--ds-surface); box-shadow: var(--ds-shadow-sm); }
 .form-field input, .form-field select, .form-field textarea { border: 1px solid var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-surface); color: var(--ds-text); transition: border .16s ease, box-shadow .16s ease; }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--ds-brand); box-shadow: 0 0 0 4px rgb(99 91 255 / 14%); outline: none; }

@@ -5,6 +5,9 @@ from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 from django.views.generic import TemplateView
+from apps.issues.models import Issue
+from apps.procurement.models import Tender, Bid
+from apps.contractors.models import ContractorApplication
 
 
 class HomeView(TemplateView):
@@ -21,6 +24,11 @@ class WorkspaceView(LoginRequiredMixin, TemplateView):
         context["available_memberships"] = (
             self.request.user.tenant_memberships.active().select_related("tenant")
         )
+        tenant = self.request.tenant
+        context["open_reports_count"] = Issue.objects.filter(tenant=tenant).exclude(status=Issue.Status.CLOSED).count() if tenant else 0
+        context["active_tenders_count"] = Tender.objects.filter(published=True).count()
+        context["pending_bids_count"] = Bid.objects.filter(tender__published=True).count()
+        context["active_contractors_count"] = ContractorApplication.objects.filter(status=ContractorApplication.Status.APPROVED).count()
         return context
 
 

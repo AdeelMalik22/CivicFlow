@@ -1,134 +1,78 @@
 {% extends "base.html" %}
-
-{% block title %}CivicFlow — Public infrastructure, clearly tracked{% endblock %}
-
+{% block title %}Public infrastructure, clearly tracked — CivicFlow{% endblock %}
 {% block content %}
-  <section class="hero">
-    <div class="container hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow">Accountable public service</p>
-        <h1>Public infrastructure, clearly tracked.</h1>
-        <p class="hero-summary">
-          Report local infrastructure issues and follow the response from review
-          through verified completion—all through one trusted public record.
-        </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="{% url 'issues:report' %}">Report an issue</a>
-          <a class="button button-ghost" href="#how-it-works">See how it works</a>
-        </div>
-        <ul class="trust-list" aria-label="CivicFlow service principles">
-          <li>Clear ownership</li>
-          <li>Verified completion</li>
-          <li>Privacy by design</li>
-        </ul>
-      </div>
-
-      <div class="status-card" aria-label="Example project progress">
-        <div class="status-card-header">
-          <div>
-            <p class="card-label">Transparent by default</p>
-            <h2>A clear path to resolution</h2>
-          </div>
-          <span class="status-badge">Live status</span>
-        </div>
-        <ol class="progress-list">
-          <li class="progress-complete">
-            <span class="progress-marker" aria-hidden="true">✓</span>
-            <div>
-              <strong>Issue recorded</strong>
-              <span>Location and supporting evidence secured</span>
-            </div>
-          </li>
-          <li class="progress-complete">
-            <span class="progress-marker" aria-hidden="true">✓</span>
-            <div>
-              <strong>Ownership assigned</strong>
-              <span>The responsible public team is visible</span>
-            </div>
-          </li>
-          <li class="progress-current">
-            <span class="progress-marker" aria-hidden="true"></span>
-            <div>
-              <strong>Delivery tracked</strong>
-              <span>Progress and material decisions are recorded</span>
-            </div>
-          </li>
-          <li>
-            <span class="progress-marker" aria-hidden="true"></span>
-            <div>
-              <strong>Completion verified</strong>
-              <span>Inspection is required before financial closure</span>
-            </div>
-          </li>
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="how-it-works">
-    <div class="container">
-      <div class="section-heading">
-        <p class="eyebrow">How it works</p>
-        <h2>One trusted record from report to resolution</h2>
-        <p>Clear stages make ownership, progress, and decisions easier to understand.</p>
-      </div>
-      <div class="feature-grid">
-        <article class="feature-card">
-          <span class="feature-number">01</span>
-          <h3>Report</h3>
-          <p>Describe the issue, pinpoint its location, and attach evidence through one guided flow.</p>
-        </article>
-        <article class="feature-card">
-          <span class="feature-number">02</span>
-          <h3>Follow</h3>
-          <p>Use a secure reference to follow decisions, ownership, and meaningful milestones.</p>
-        </article>
-        <article class="feature-card">
-          <span class="feature-number">03</span>
-          <h3>Verify</h3>
-          <p>See that evidence and inspection decisions are recorded before financial closure.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section section-tinted" id="accountability">
-    <div class="container accountability-grid">
-      <div>
-        <p class="eyebrow">Accountability by design</p>
-        <h2>Every important action has an owner and history.</h2>
-      </div>
-      <div class="principle-list">
+    <section class="hero">
         <div>
-          <h3>Role-based decisions</h3>
-          <p>Each stakeholder sees and performs only the work assigned to their role.</p>
+            <div class="eyebrow">Public accountability infrastructure</div>
+            <h1 class="display">Public infrastructure, clearly tracked.</h1>
+            <p class="lead">A shared operating system for citizens, departments, contractors and procurement teams—from
+                first report to verified completion.</p>
+            <div class="actions"><a class="btn btn-primary" href="{% url 'issues:report' %}">Report an issue</a><a
+                    class="btn btn-secondary" href="{% url 'issues:track-lookup' %}">Track a report</a></div>
         </div>
+        <div class="status-viz">
+            <div class="eyebrow" style="color:#A7A2FF">Live accountability chain</div>
+            <h3 style="font-size:28px">Drainage fault • CF-29418</h3>
+            <div class="status-row"><span class="dot"></span>
+                <div><strong>Issue recorded</strong>
+                    <div class="muted">Citizen evidence securely received</div>
+                </div>
+            </div>
+            <div class="status-row"><span class="dot"></span>
+                <div><strong>Ownership assigned</strong>
+                    <div class="muted">Roads &amp; Drainage • Team 04</div>
+                </div>
+            </div>
+            <div class="status-row"><span class="dot"></span>
+                <div><strong>Delivery tracked</strong>
+                    <div class="muted">Contractor arrival due tomorrow</div>
+                </div>
+            </div>
+            <div class="status-row"><span class="dot"></span>
+                <div><strong>Completion verified</strong>
+                    <div class="muted">Awaiting citizen confirmation</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="trust-strip">
+        <div class="trust-item"><strong>Clear ownership</strong>
+            <p class="muted">Every issue has a responsible team.</p></div>
+        <div class="trust-item"><strong>Verified completion</strong>
+            <p class="muted">Evidence closes the accountability loop.</p></div>
+        <div class="trust-item"><strong>Privacy by design</strong>
+            <p class="muted">Sensitive citizen information stays protected.</p></div>
+    </section>
+    <section class="section">
+        <div class="section-grid">
+            <div>
+                <div class="eyebrow">One transparent process</div>
+                <h2>Report. Follow. Verify.</h2></div>
+            <div class="process">
+                <article><span class="n">01</span>
+                    <h3>Report</h3>
+                    <p class="muted">Capture location, evidence and impact in minutes.</p></article>
+                <article><span class="n">02</span>
+                    <h3>Follow</h3>
+                    <p class="muted">See ownership, decisions and delivery progress.</p></article>
+                <article><span class="n">03</span>
+                    <h3>Verify</h3>
+                    <p class="muted">Confirm outcomes with auditable evidence.</p></article>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
         <div>
-          <h3>Evidence-backed delivery</h3>
-          <p>Progress, completion, inspection, and payment decisions retain their evidence.</p>
-        </div>
-        <div>
-          <h3>Citizen-safe transparency</h3>
-          <p>Useful project progress is public while personal and confidential data stays protected.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section launch-grid" id="citizen-services" aria-label="CivicFlow citizen services">
-    <div class="container action-grid">
-      <article class="action-card">
-        <p class="eyebrow">For citizens</p>
-        <h2>Report a local issue</h2>
-        <p>Describe the issue, pinpoint its location, and receive a private reference for updates.</p>
-        <a class="button button-primary button-small" href="{% url 'issues:report' %}">Start a report</a>
-      </article>
-      <article class="action-card">
-        <p class="eyebrow">Public tracking</p>
-        <h2>Follow a report</h2>
-        <p>Use your report reference and private verification code to follow safe progress updates.</p>
-        <a class="button button-secondary button-small" href="{% url 'issues:track-lookup' %}">Track a report</a>
-      </article>
-    </div>
-  </section>
+            <div class="brand"><span class="brand-mark"></span><span>CivicFlow</span></div>
+            <p>Infrastructure accountability, designed for trust.</p></div>
+        <div><strong>Product</strong>
+            <p><a href="{% url 'home' %}#how-it-works">How it works</a></p>
+            <p><a href="{% url 'home' %}#accountability">Accountability</a></p></div>
+        <div><strong>Resources</strong>
+            <p>Help centre</p>
+            <p>Privacy</p></div>
+        <div><strong>Account</strong>
+            <p><a href="{% url 'login' %}">Sign in</a></p>
+            <p><a href="{% url 'signup' %}">Create account</a></p></div>
+    </footer>
 {% endblock %}
