@@ -103,8 +103,31 @@ class MyIssueListView(LoginRequiredMixin, ListView):
     context_object_name = "issues"
     login_url = "login"
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return redirect("issues:reports")
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
-        return Issue.objects.filter(reporter=self.request.user).select_related("service_area")
+        queryset = Issue.objects.filter(reporter=self.request.user).select_related("service_area", "tenant").order_by("-created_at")
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(reference__icontains=query) | queryset.filter(description__icontains=query)
+        if category := self.request.GET.get("category"):
+            queryset = queryset.filter(category=category)
+        if status := self.request.GET.get("status"):
+            queryset = queryset.filter(status=status)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Issue.Category.choices
+        context["statuses"] = Issue.Status.choices
+        context["total_reports"] = Issue.objects.filter(reporter=self.request.user).count()
+        context["open_reports"] = Issue.objects.filter(reporter=self.request.user).exclude(
+            status__in=(Issue.Status.CLOSED, Issue.Status.REJECTED, Issue.Status.DUPLICATE)
+        ).count()
+        return context
 
 
 class IssueOperationsListView(LoginRequiredMixin, ListView):

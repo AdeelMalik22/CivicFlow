@@ -1,16 +1,10 @@
 {% extends "base.html" %}
 {% block title %}My reports — CivicFlow{% endblock %}
 {% block content %}
-<section class="tracking-section"><div class="container">
-  <p class="eyebrow">Citizen account</p><h1>My reports</h1>
-  <p class="section-intro">Track issues you have submitted from one place.</p>
-  <div class="tracking-card">
-    {% for issue in issues %}
-      <a class="report-list-item" href="{% url 'issues:track' reference=issue.reference token='account' %}">
-        <span><strong>{{ issue.reference }}</strong><small>{{ issue.get_category_display }} · {{ issue.service_area.name }}</small></span>
-        <span class="status-badge status-{{ issue.status }}">{{ issue.get_status_display }}</span>
-      </a>
-    {% empty %}<p>You have not reported any issues yet.</p>{% endfor %}
-  </div>
+<section class="tracking-section reports-directory"><div class="container">
+  <div class="directory-header"><div><p class="eyebrow">Citizen account</p><h1>My reports</h1><p class="section-intro">Track every issue you have submitted and see what happens next.</p></div><a class="button button-primary" href="{% url 'issues:report' %}">Report an issue</a></div>
+  <div class="report-summary"><div><span>Total reports</span><strong>{{ total_reports }}</strong></div><div><span>Still in progress</span><strong>{{ open_reports }}</strong></div><div><span>Privacy protected</span><strong>100%</strong></div></div>
+  <form class="reports-filters" method="get"><label><span>Search</span><input name="q" value="{{ request.GET.q }}" placeholder="Reference or description"></label><label><span>Category</span><select name="category"><option value="">All categories</option>{% for value,label in categories %}<option value="{{ value }}"{% if request.GET.category == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><label><span>Status</span><select name="status"><option value="">All statuses</option>{% for value,label in statuses %}<option value="{{ value }}"{% if request.GET.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><button class="button button-secondary" type="submit">Apply filters</button></form>
+  <div class="reports-list"><div class="reports-list-heading"><h2>Your submissions</h2><span>{{ issues|length }} shown</span></div>{% for issue in issues %}<a class="report-card" href="{% url 'issues:track' reference=issue.reference token='account' %}"><div class="report-card-icon">{% if issue.category == 'roads' %}↗{% elif issue.category == 'lighting' %}✦{% else %}•{% endif %}</div><div class="report-card-main"><div class="report-card-title"><strong>{{ issue.title|default:issue.get_category_display }}</strong><span class="status-badge status-{{ issue.status }}">{{ issue.get_status_display }}</span></div><p>{{ issue.description|truncatewords:18 }}</p><div class="report-meta"><span><b>Reference</b> {{ issue.reference }}</span><span><b>Area</b> {{ issue.service_area.name }}</span><span><b>Reported</b> {{ issue.created_at|date:"d M Y" }}</span></div></div><span class="report-arrow">→</span></a>{% empty %}<div class="reports-empty"><div class="empty-icon">+</div><h2>No reports match these filters</h2><p>Start by reporting an infrastructure issue in your community.</p><a class="button button-primary" href="{% url 'issues:report' %}">Report an issue</a></div>{% endfor %}</div>
 </div></section>
 {% endblock %}

@@ -1,1 +1,22 @@
-{% extends "workspace/base.html" %}{% block title %}Reports — CivicFlow{% endblock %}{% block workspace_content %}<section class="content"><div class="page-head"><div><div class="eyebrow">Issue operations</div><h1>Reports</h1><p class="muted">Filter, assign and follow every infrastructure issue.</p></div><a class="btn btn-primary" href="{% url 'issues:report' %}">New report</a></div><form class="filterbar" method="get"><input class="field" name="q" value="{{ request.GET.q }}" placeholder="Search reference or location"><select class="select" name="category"><option value="">All categories</option>{% for value,label in categories %}<option value="{{ value }}"{% if request.GET.category == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select><select class="select" name="status"><option value="">All statuses</option>{% for value,label in statuses %}<option value="{{ value }}"{% if request.GET.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="btn btn-secondary" type="submit">Filter</button></form><div class="feed">{% for issue in issues %}<div class="feed-row"><div><strong>{{ issue.reference }} • {{ issue.get_category_display }}</strong><div class="muted">{{ issue.service_area.name }}</div></div><span>{{ issue.get_category_display }}</span><span class="status">{{ issue.get_status_display }}</span><span>{{ issue.created_at|timesince }}</span><a class="btn btn-secondary" href="{% url 'issues:track-lookup' %}">Open</a></div>{% empty %}<div class="empty"><h3>No reports found</h3><p>Try changing the filters or create a new report.</p></div>{% endfor %}</div></section>{% endblock %}
+{% extends "workspace/base.html" %}
+{% block title %}Reports — CivicFlow{% endblock %}
+{% block workspace_content %}
+<section class="content operations-reports">
+  <div class="page-head">
+    <div><div class="eyebrow">Issue operations</div><h1>Reports</h1><p class="muted">Filter, assign and follow every infrastructure issue.</p></div>
+    <a class="btn btn-primary report-action" href="{% url 'issues:report' %}">New report</a>
+  </div>
+  <form class="filterbar report-filters" method="get">
+    <input class="field" name="q" value="{{ request.GET.q }}" placeholder="Search reference or location">
+    <select class="select" name="category"><option value="">All categories</option>{% for value,label in categories %}<option value="{{ value }}"{% if request.GET.category == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select class="select" name="status"><option value="">All statuses</option>{% for value,label in statuses %}<option value="{{ value }}"{% if request.GET.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select class="select" name="area"><option value="">All areas</option>{% for area in service_areas %}<option value="{{ area.pk }}"{% if request.GET.area == area.pk|stringformat:'s' %} selected{% endif %}>{{ area.name }}</option>{% endfor %}</select>
+    <button class="btn btn-secondary filter-submit" type="submit">Filter</button>
+  </form>
+  <div class="operations-feed">
+    {% for issue in issues %}
+      <article class="operation-row"><div class="operation-identity"><strong>{{ issue.reference }} <span>•</span> {{ issue.title|default:issue.get_category_display }}</strong><div class="muted">{{ issue.service_area.name }}{% if issue.location %} · Location captured{% endif %}</div></div><span class="operation-category">{{ issue.get_category_display }}</span><span class="status status-{{ issue.status }}">{{ issue.get_status_display }}</span><span class="operation-age">{{ issue.created_at|timesince }}</span><a class="btn btn-secondary row-action" href="{% url 'issues:track-lookup' %}">Open</a></article>
+    {% empty %}<div class="empty"><h3>No reports found</h3><p>Try changing the filters or create a new report.</p><a class="btn btn-primary" href="{% url 'issues:report' %}">Report an issue</a></div>{% endfor %}
+  </div>
+</section>
+{% endblock %}
