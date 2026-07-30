@@ -1,0 +1,22 @@
+{% extends "workspace/base.html" %}{% block title %}Audit activity — CivicFlow{% endblock %}
+{% block workspace_content %}
+    <section class="content">
+        <div class="page-head">
+            <div>
+                <div class="eyebrow">Immutable history</div>
+                <h1>Audit activity</h1>
+                <p class="muted">A complete record of material procurement actions.</p></div>
+        </div>
+        <div class="panel">
+            <div class="filterbar"><input class="field" placeholder="Search activity"><select class="select">
+                <option>All actors</option>
+            </select></div>{% for event in events %}
+            <div class="audit-row"><span class="avatar"></span>
+                <div><strong>{{ event.actor|default:"System" }} {{ event.action }}</strong>
+                    <div class="muted">
+                        {{ event.tender.reference }}{% if event.note %} · {{ event.note }}{% endif %}</div>
+                </div>
+                <small>{{ event.created_at|timesince }} ago</small></div>{% empty %}
+            <div class="empty"><h3>No audit activity</h3>
+                <p>Material procurement actions will appear here.</p></div>{% endfor %}</div>
+    </section>{% endblock %}

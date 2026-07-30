@@ -67,3 +67,9 @@ class TenderAuditView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     def get_queryset(self):
         tender = get_object_or_404(Tender, pk=self.kwargs["pk"])
         return tender.audit_events.select_related("actor")
+
+class AuditActivityView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    template_name = "procurement/audit_activity.html"
+    context_object_name = "events"
+    def test_func(self): return self.request.user.is_staff
+    def get_queryset(self): return ProcurementAuditEvent.objects.select_related("actor", "tender")
