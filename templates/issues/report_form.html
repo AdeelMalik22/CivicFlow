@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Report an issue — CivicFlow{% endblock %}
-{% block extra_head %}{{ form.media.css }}{% endblock %}
+{% block extra_head %}{{ form.media.css }}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />{% endblock %}
 {% block content %}
 <section class="section report-page" style="padding-top:54px">
   <div class="page-head"><div><div class="eyebrow">Citizen reporting</div><h1>Tell us what needs attention</h1><p class="muted">You can save progress and return later.</p></div><span class="status">Step 1 of 4</span></div>
@@ -24,6 +24,24 @@
 {% endblock %}
 {% block extra_scripts %}
 {{ form.media.js }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+(function () {
+  function init() {
+    const host = document.getElementById('id_location_map'), field = document.getElementById('id_location');
+    if (!host || !field || !window.L || host.dataset.leafletReady) return;
+    host.dataset.leafletReady = '1'; host.innerHTML = ''; host.style.height = '420px';
+    const map = L.map(host, { zoomControl: true }).setView([24.8607, 67.0011], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+    let pin;
+    function place(lat, lon) { if (pin) pin.setLatLng([lat, lon]); else pin = L.marker([lat, lon]).addTo(map); field.value = `POINT (${lon.toFixed(6)} ${lat.toFixed(6)})`; }
+    map.on('click', e => place(e.latlng.lat, e.latlng.lng));
+    const locate = L.control({position:'topleft'}); locate.onAdd = function () { const b = L.DomUtil.create('button','leaflet-bar leaflet-control-locate'); b.type='button'; b.title='Use my location'; b.textContent='◎'; L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b,'click',()=>navigator.geolocation && navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude,p.coords.longitude],16); place(p.coords.latitude,p.coords.longitude);})); return b; }; locate.addTo(map);
+    setTimeout(() => map.invalidateSize(), 100);
+  }
+  setTimeout(init, 100);
+})();
+</script>
 <script>
 /* The bundled Django GIS widget can fail silently when its OpenLayers asset is
    unavailable. Keep location selection usable: show an OSM map and write the
@@ -32,7 +50,7 @@
   function mountLocationPicker() {
     const map = document.getElementById('id_location_map');
     const field = document.getElementById('id_location');
-    if (!map || !field || map.dataset.civicflowPicker === 'true') return;
+    if (!map || !field || map.dataset.civicflowPicker === 'true' || map.dataset.leafletReady === '1') return;
 
     map.dataset.civicflowPicker = 'true';
     map.className = 'location-map-picker';
@@ -42,7 +60,7 @@
         <button type="button" class="location-map-clear">Clear pin</button>
       </div>
       <div class="location-map-surface" role="application" aria-label="Map location picker">
-        <div class="location-map-controls"><button type="button" data-map-zoom="in" aria-label="Zoom in">+</button><button type="button" data-map-zoom="out" aria-label="Zoom out">−</button></div>
+        <div class="location-map-controls"><button type="button" data-map-zoom="in" aria-label="Zoom in">+</button><button type="button" data-map-zoom="out" aria-label="Zoom out">−</button><button type="button" data-map-locate aria-label="Use my location">◎</button></div>
         <div class="location-map-attribution">© OpenStreetMap contributors</div>
         <div class="location-map-marker" hidden></div>
       </div>
@@ -53,29 +71,36 @@
     const status = map.querySelector('.location-map-status');
     const clear = map.querySelector('.location-map-clear');
 
-    // Karachi-area extent used by the public service areas. The map remains
-    // a normal OSM map image; clicking translates the pin to a WKT POINT.
-    const bounds = { minLon: 66.80, maxLon: 67.20, minLat: 24.70, maxLat: 25.00 };
+    // Use the browser's location when available; Karachi is only the fallback.
+    let mapCenter = { lon: 67.0011, lat: 24.8607 };
+    let bounds = { minLon: 66.80, maxLon: 67.20, minLat: 24.70, maxLat: 25.00 };
     // Build a small real OSM tile mosaic instead of stretching one image.
     const zoom = 12;
-    const centerLon = 67.0011;
-    const centerLat = 24.8607;
-    const n = Math.pow(2, zoom);
-    const centerX = Math.floor((centerLon + 180) / 360 * n);
-    const latRad = centerLat * Math.PI / 180;
-    const centerY = Math.floor((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2 * n);
     const tiles = document.createElement('div');
     tiles.className = 'location-map-tiles';
-    for (let row = -1; row <= 1; row++) {
-      for (let col = -1; col <= 1; col++) {
-        const image = document.createElement('img');
-        image.alt = '';
-        image.draggable = false;
-        image.src = `https://tile.openstreetmap.org/${zoom}/${centerX + col}/${centerY + row}.png`;
+    function renderTiles(lon, lat) {
+      const n = Math.pow(2, zoom), x = Math.floor((lon + 180) / 360 * n);
+      const latRad = lat * Math.PI / 180, y = Math.floor((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2 * n);
+      tiles.innerHTML = '';
+      for (let row = -1; row <= 1; row++) for (let col = -1; col <= 1; col++) {
+        const image = document.createElement('img'); image.alt = ''; image.draggable = false;
+        image.src = `https://tile.openstreetmap.org/${zoom}/${x + col}/${y + row}.png`;
         tiles.appendChild(image);
       }
+      bounds = { minLon: lon - .20, maxLon: lon + .20, minLat: lat - .15, maxLat: lat + .15 };
     }
+    renderTiles(mapCenter.lon, mapCenter.lat);
     surface.prepend(tiles);
+    function useDeviceLocation() {
+      if (!navigator.geolocation) { status.textContent = 'Location is unavailable; showing the default map.'; return; }
+      status.textContent = 'Requesting your location…';
+      navigator.geolocation.getCurrentPosition(function (position) {
+        mapCenter = { lon: position.coords.longitude, lat: position.coords.latitude };
+        renderTiles(mapCenter.lon, mapCenter.lat); offsetX = 0; offsetY = 0; applyMapTransform();
+        status.textContent = 'Map centered on your location. Click to place the issue pin.';
+      }, function () { status.textContent = 'Location permission was not granted; showing the default map.'; }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+    window.setTimeout(useDeviceLocation, 350);
     let zoomLevel = zoom;
     let offsetX = 0, offsetY = 0, dragStartX = 0, dragStartY = 0, dragging = false, moved = false;
     function applyMapTransform() { tiles.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${Math.pow(2, zoomLevel - zoom)})`; }
@@ -107,6 +132,7 @@
         applyMapTransform();
       });
     });
+    map.querySelector('[data-map-locate]').addEventListener('click', useDeviceLocation);
     function clearPin() {
       field.value = '';
       marker.hidden = true;

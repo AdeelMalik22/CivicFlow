@@ -1202,6 +1202,8 @@ h3 {
   background: #eef3f5;
   box-shadow: 0 8px 22px rgba(16, 24, 40, .06);
 }
+.report-page #id_location_map.leaflet-container { min-height:420px; overflow:hidden; z-index:0; }
+.leaflet-control-locate { width:30px; height:30px; border:0; background:#fff; color:#344054; cursor:pointer; font-size:1.2rem; }
 .location-map-toolbar {
   display: flex;
   align-items: center;
