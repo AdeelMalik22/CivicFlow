@@ -4,10 +4,12 @@ from django.db.utils import OperationalError
 from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
-from django.views.generic import TemplateView
+from django.views.generic import CreateView, ListView, TemplateView
 from apps.issues.models import Issue
 from apps.procurement.models import Tender, Bid
 from apps.contractors.models import ContractorApplication
+from .forms import ProjectForm
+from .models import Project
 
 
 class HomeView(TemplateView):
@@ -19,8 +21,23 @@ class HowItWorksView(TemplateView):
 class AccountabilityView(TemplateView):
     template_name = "accountability.html"
 
-class ProjectsView(LoginRequiredMixin, TemplateView):
+class ProjectsView(LoginRequiredMixin, ListView):
     template_name = "workspace/projects.html"
+    context_object_name = "projects"
+
+    def get_queryset(self):
+        return Project.objects.filter(tenant=getattr(self.request, "tenant", None))
+
+
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+    form_class = ProjectForm
+    template_name = "workspace/project_form.html"
+    success_url = "/workspace/projects/"
+
+    def form_valid(self, form):
+        form.instance.tenant = self.request.tenant
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
 
 
 class WorkspaceView(LoginRequiredMixin, TemplateView):
