@@ -7,6 +7,7 @@ from .models import (
     RolePermission,
     SeparationOfDutiesPolicy,
     StaffInvitation,
+    SignupOTP,
     TenantRole,
     User,
 )
@@ -91,6 +92,23 @@ class StaffInvitationAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None) -> bool:
         return False
+
+
+@admin.register(RolePermission)
+class RolePermissionAdmin(admin.ModelAdmin):
+    list_display = ("role", "permission", "scope")
+    list_filter = ("scope", "role__tenant", "permission__is_sensitive")
+    search_fields = ("role__name", "permission__name", "permission__code")
+    autocomplete_fields = ("role", "permission")
+
+
+@admin.register(SignupOTP)
+class SignupOTPAdmin(admin.ModelAdmin):
+    list_display = ("user", "created_at", "expires_at", "attempts")
+    list_filter = ("created_at", "expires_at")
+    search_fields = ("user__email",)
+    readonly_fields = ("user", "created_at", "expires_at", "attempts")
+    def has_add_permission(self, request): return False
     add_fieldsets = (
         (
             None,

@@ -133,6 +133,7 @@ class MyIssueListView(LoginRequiredMixin, ListView):
 class IssueOperationsListView(LoginRequiredMixin, ListView):
     template_name = "issues/reports.html"
     context_object_name = "issues"
+    paginate_by = 10
     def get_queryset(self):
         queryset = Issue.objects.select_related("service_area", "tenant").order_by("-created_at")
         tenant = getattr(self.request, "tenant", None)
