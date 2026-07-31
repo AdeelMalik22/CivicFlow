@@ -536,3 +536,59 @@ For release candidates:
 6. Implement citizen reporting as the first end-to-end product slice.
 
 This sequence deliberately makes tenant isolation, authorization, audit, and secure evidence handling foundational capabilities. Retrofitting them after tender or payment workflows would be significantly riskier.
+
+## 16. Remaining Product Work
+
+The following backlog captures the remaining work identified during implementation and visual review of the reference screens.
+
+### Priority 1 — Complete core workflows
+
+1. **Service-area map editor**
+   - Make the OpenLayers map load reliably without depending on an unavailable CDN.
+   - Keep the local drawing fallback usable when map assets cannot load.
+   - Support drawing, editing, closing, clearing, and validating WGS 84 multipolygon boundaries.
+   - Add browser-level tests for submitting and editing boundaries.
+
+2. **Reports operations**
+   - Make each Open action resolve directly to the selected report.
+   - Add assignment and reassignment workflows.
+   - Add pagination, bulk actions, and CSV export where authorized.
+   - Preserve search, category, status, and service-area filters in pagination and actions.
+
+3. **Procurement lifecycle**
+   - Add tender detail and edit screens.
+   - Implement draft, publish, unpublish, close, cancel, and award states.
+   - Display budget, location, category, dates, attachments, and evaluation criteria.
+   - Validate file type and size and provide attachment download/preview behavior.
+
+### Priority 2 — Administration completeness
+
+4. **Roles and policies**
+   - Add clear role-level edit controls.
+   - Add safe activate/deactivate or archive behavior.
+   - Prevent deactivation of roles required by active memberships without an explicit migration path.
+   - Keep capabilities database-backed and editable through the role form rather than decorative matrix controls.
+
+5. **Membership administration**
+   - Add visible role assignments in the directory and edit workflow.
+   - Add activate, suspend, resend invitation, and confirmation flows.
+   - Ensure all membership actions remain tenant-scoped and audited.
+
+6. **Account settings**
+   - Replace informational notification and organization-preference cards with persisted settings where those features are approved.
+   - Add success/error feedback after profile and password changes.
+   - Add session/security visibility and MFA controls when the authentication provider is selected.
+
+### Priority 3 — Quality and release readiness
+
+7. **UI consistency pass**
+   - Verify headers, profile dropdowns, buttons, inputs, selects, maps, empty states, and error states across every workspace page.
+   - Test desktop, tablet, and mobile layouts.
+   - Remove placeholder copy and any static sample data from production templates.
+   - Confirm every visible action has a working route and appropriate permission check.
+
+8. **Testing and deployment**
+   - Restore PostgreSQL/PostGIS availability and run the full test suite.
+   - Add browser tests for critical flows: report, track, tender, membership, role, settings, and service-area boundary creation.
+   - Run migrations against a clean database and verify static/media serving.
+   - Perform a tenant-isolation, authorization, upload-security, and audit-log review before staging deployment.
