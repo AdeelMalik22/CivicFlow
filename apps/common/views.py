@@ -4,7 +4,7 @@ from django.db.utils import OperationalError
 from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
-from django.views.generic import CreateView, ListView, TemplateView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from apps.issues.models import Issue
 from apps.procurement.models import Tender, Bid
 from apps.contractors.models import ContractorApplication
@@ -52,6 +52,21 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
         form.instance.tenant = tenant
         form.instance.created_by = self.request.user
         return super().form_valid(form)
+
+
+class ProjectDetailView(LoginRequiredMixin, DetailView):
+    model = Project
+    template_name = "workspace/project_detail.html"
+    context_object_name = "project"
+
+    def get_queryset(self):
+        tenant = getattr(self.request, "tenant", None)
+        if tenant is None and self.request.user.is_superuser:
+            return Project.objects.select_related("tenant", "created_by")
+        if tenant is None:
+            membership = self.request.user.tenant_memberships.active().select_related("tenant").first()
+            tenant = membership.tenant if membership else None
+        return Project.objects.filter(tenant=tenant).select_related("tenant", "created_by") if tenant else Project.objects.none()
 
 
 class WorkspaceView(LoginRequiredMixin, TemplateView):
