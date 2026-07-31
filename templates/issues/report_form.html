@@ -31,12 +31,15 @@
     const host = document.getElementById('id_location_map'), field = document.getElementById('id_location');
     if (!host || !field || !window.L || host.dataset.leafletReady) return;
     host.dataset.leafletReady = '1'; host.innerHTML = ''; host.style.height = '420px';
-    const map = L.map(host, { zoomControl: true }).setView([24.8607, 67.0011], 12);
+    const map = L.map(host, { zoomControl: true, dragging: true, scrollWheelZoom: true, touchZoom: true, doubleClickZoom: true, boxZoom: true, keyboard: true }).setView([24.8607, 67.0011], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
     let pin;
     function place(lat, lon) { if (pin) pin.setLatLng([lat, lon]); else pin = L.marker([lat, lon]).addTo(map); field.value = `POINT (${lon.toFixed(6)} ${lat.toFixed(6)})`; }
     map.on('click', e => place(e.latlng.lat, e.latlng.lng));
+    map.on('locationfound', e => { map.setView(e.latlng, 16); place(e.latlng.lat, e.latlng.lng); });
+    map.on('locationerror', e => { host.setAttribute('data-location-error', e.message || 'Location permission was not granted.'); });
     const locate = L.control({position:'topleft'}); locate.onAdd = function () { const b = L.DomUtil.create('button','leaflet-bar leaflet-control-locate'); b.type='button'; b.title='Use my location'; b.textContent='◎'; L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b,'click',()=>navigator.geolocation && navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude,p.coords.longitude],16); place(p.coords.latitude,p.coords.longitude);})); return b; }; locate.addTo(map);
+    map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true, watch: false });
     setTimeout(() => map.invalidateSize(), 100);
   }
   setTimeout(init, 100);
