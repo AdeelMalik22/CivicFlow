@@ -24,6 +24,7 @@ class AccountabilityView(TemplateView):
 class ProjectsView(LoginRequiredMixin, ListView):
     template_name = "workspace/projects.html"
     context_object_name = "projects"
+    paginate_by = 10
 
     def get_queryset(self):
         tenant = getattr(self.request, "tenant", None)
@@ -32,7 +33,7 @@ class ProjectsView(LoginRequiredMixin, ListView):
         if tenant is None:
             membership = self.request.user.tenant_memberships.active().select_related("tenant").first()
             tenant = membership.tenant if membership else None
-        return Project.objects.filter(tenant=tenant).select_related("tenant", "created_by") if tenant else Project.objects.none()
+        return Project.objects.filter(tenant=tenant).select_related("tenant", "created_by").order_by("-created_at") if tenant else Project.objects.none()
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
