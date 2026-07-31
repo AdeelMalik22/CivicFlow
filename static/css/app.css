@@ -1194,6 +1194,56 @@ h3 {
   text-decoration: none;
 }
 
+.location-map-picker {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #cfd8e3;
+  border-radius: 12px;
+  background: #eef3f5;
+  box-shadow: 0 8px 22px rgba(16, 24, 40, .06);
+}
+.location-map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .75rem .9rem;
+  background: #fff;
+  color: #172235;
+}
+.location-map-toolbar span { display: grid; gap: .15rem; }
+.location-map-toolbar small { color: #667085; font-size: .76rem; }
+.location-map-clear {
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+  padding: .45rem .7rem;
+  background: #fff;
+  color: #344054;
+  cursor: pointer;
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 700;
+}
+.location-map-surface {
+  position: relative;
+  min-height: 420px;
+  cursor: grab;
+  background-color: #dce9e8;
+  background-image: linear-gradient(rgba(255,255,255,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.16) 1px, transparent 1px);
+  background-size: 42px 42px;
+  background-position: center;
+}
+.location-map-surface.is-dragging { cursor: grabbing; }
+.location-map-tiles { transition: transform .18s ease-out; transform-origin: center; }
+.location-map-controls { position:absolute; z-index:4; top:12px; left:12px; display:grid; overflow:hidden; border:1px solid #d0d5dd; border-radius:8px; box-shadow:0 2px 8px rgba(16,24,40,.18); }
+.location-map-controls button { width:34px; height:34px; border:0; border-bottom:1px solid #eaecf0; background:#fff; color:#344054; cursor:pointer; font-size:1.25rem; line-height:1; }
+.location-map-controls button:last-child { border-bottom:0; }
+.location-map-tiles { position:absolute; inset:0; display:grid; grid-template-columns:repeat(3, 1fr); grid-template-rows:repeat(3, 1fr); background:#dbe7e5; }
+.location-map-tiles img { width:100%; height:100%; object-fit:cover; user-select:none; }
+.location-map-attribution { position: absolute; right: 7px; bottom: 5px; z-index: 2; padding: 2px 5px; background: rgba(255,255,255,.85); color: #475467; font-size: .65rem; }
+.location-map-marker { position: absolute; z-index: 3; width: 18px; height: 18px; transform: translate(-50%, -100%) rotate(45deg); border: 3px solid #fff; border-radius: 50% 50% 50% 0; background: #e04f39; box-shadow: 0 3px 9px rgba(0,0,0,.35); }
+.location-map-status { min-height: 1.1rem; padding: .55rem .9rem; background: #fff; color: #667085; font-size: .78rem; }
+
 .message-success {
   color: #05603f;
   border-color: #a9ddcb;
