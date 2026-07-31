@@ -26,7 +26,13 @@ class ProjectsView(LoginRequiredMixin, ListView):
     context_object_name = "projects"
 
     def get_queryset(self):
-        return Project.objects.filter(tenant=getattr(self.request, "tenant", None))
+        tenant = getattr(self.request, "tenant", None)
+        if tenant is None and self.request.user.is_superuser:
+            return Project.objects.all()
+        if tenant is None:
+            membership = self.request.user.tenant_memberships.active().select_related("tenant").first()
+            tenant = membership.tenant if membership else None
+        return Project.objects.filter(tenant=tenant).select_related("tenant", "created_by") if tenant else Project.objects.none()
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
@@ -35,7 +41,14 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
     success_url = "/workspace/projects/"
 
     def form_valid(self, form):
-        form.instance.tenant = self.request.tenant
+        tenant = getattr(self.request, "tenant", None)
+        if tenant is None:
+            membership = self.request.user.tenant_memberships.active().select_related("tenant").first()
+            tenant = membership.tenant if membership else None
+        if tenant is None:
+            form.add_error(None, "Select an active organization before creating a project.")
+            return self.form_invalid(form)
+        form.instance.tenant = tenant
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
