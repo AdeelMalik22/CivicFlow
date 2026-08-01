@@ -5,6 +5,7 @@ from .views import (
     IssueSubmittedView,
     MyIssueListView,
     IssueOperationsListView,
+    IssueOperationsDetailView,
     PublicIssueTrackingView,
     PublicTrackingLookupView,
 )
@@ -21,6 +22,7 @@ urlpatterns = [
     path("track/", PublicTrackingLookupView.as_view(), name="track-lookup"),
     path("my-reports/", MyIssueListView.as_view(), name="my_reports"),
     path("reports/", IssueOperationsListView.as_view(), name="reports"),
+    path("reports/<int:pk>/", IssueOperationsDetailView.as_view(), name="report_detail"),
     path(
         "track/<str:reference>/<str:token>/",
         PublicIssueTrackingView.as_view(),

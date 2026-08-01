@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.views.generic import FormView, ListView, TemplateView
+from django.views.generic import DetailView, FormView, ListView, TemplateView
 from apps.tenants.models import ServiceArea
 
 from .forms import IssueReportForm, PublicTrackingForm
@@ -161,3 +161,16 @@ class IssueOperationsListView(LoginRequiredMixin, ListView):
         context["statuses"] = Issue.Status.choices
         context["service_areas"] = self.get_queryset().model.service_area.field.related_model.objects.filter(tenant=self.request.tenant, is_active=True) if getattr(self.request, "tenant", None) else []
         return context
+
+
+class IssueOperationsDetailView(LoginRequiredMixin, DetailView):
+    template_name = "issues/report_detail.html"
+    context_object_name = "issue"
+    model = Issue
+
+    def get_queryset(self):
+        queryset = Issue.objects.select_related("service_area", "tenant", "reporter").prefetch_related(
+            "status_events", "attachments"
+        )
+        tenant = getattr(self.request, "tenant", None)
+        return queryset.filter(tenant=tenant) if tenant else queryset.none()
