@@ -105,6 +105,7 @@ class PublicIssueTrackingView(TemplateView):
 class MyIssueListView(LoginRequiredMixin, ListView):
     template_name = "issues/my_reports.html"
     context_object_name = "issues"
+    paginate_by = 10
     login_url = "login"
 
     def dispatch(self, request, *args, **kwargs):
