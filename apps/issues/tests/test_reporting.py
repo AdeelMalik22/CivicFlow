@@ -1,11 +1,14 @@
 import pytest
+from django.core import mail
+from django.core.cache import cache
+from django.test import override_settings
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import MultiPolygon, Point, Polygon
 from django.test import Client
 from django.urls import reverse
 
 from apps.issues.forms import IssueReportForm
-from apps.issues.models import Issue, IssueStatusEvent
+from apps.issues.models import Issue, IssueInternalNote, IssueStatusEvent
 from apps.tenants.models import ServiceArea, Tenant
 
 User = get_user_model()
@@ -123,3 +126,51 @@ def test_public_tracking_does_not_expose_contact_details(client: Client):
     assert response.status_code == 200
     assert b"private@example.com" not in response.content
     assert b"Broken sidewalk." not in response.content
+
+
+@pytest.mark.django_db
+def test_report_form_rejects_point_inside_bbox_but_outside_polygon():
+    tenant = Tenant.objects.create(name="City", slug="polygon-city", status=Tenant.Status.ACTIVE)
+    area = ServiceArea.objects.create(
+        tenant=tenant, name="Concave", code="CONCAVE",
+        boundary=MultiPolygon(Polygon((0, 0), (2, 0), (2, 1), (1, 1), (1, 2), (0, 2), (0, 0), srid=4326)),
+    )
+    form = IssueReportForm(data={"service_area": area.pk, "category": Issue.Category.OTHER, "description": "Blocked access.", "location": "POINT (1.5 1.5)", "contact_preference": Issue.ContactPreference.NONE})
+    assert not form.is_valid()
+    assert "location" in form.errors
+
+
+@pytest.mark.django_db
+def test_staff_update_assigns_department_and_creates_private_note(client: Client):
+    area = service_area("Central", "City", "assign-city")
+    staff = User.objects.create_user(email="staff@example.com", password="pass", is_staff=True)
+    department = area.tenant.departments.create(name="Roads", code="ROADS")
+    issue = Issue.objects.create(reference="CF-20260730-ASSIGN", tenant=area.tenant, service_area=area, category=Issue.Category.POTHOLE, description="Pothole", location=Point(.5, .5, srid=4326), tracking_token_hash="x")
+    client.force_login(staff)
+    response = client.post(reverse("issues:report_detail", kwargs={"pk": issue.pk}), {"status": Issue.Status.UNDER_REVIEW, "assigned_to": staff.pk, "assigned_department": department.pk, "public_message": "Team assigned.", "internal_note": "Inspect before dispatch."})
+    assert response.status_code == 302
+    issue.refresh_from_db()
+    assert issue.assigned_to_id == staff.pk and issue.assigned_department_id == department.pk
+    assert IssueInternalNote.objects.filter(issue=issue, body="Inspect before dispatch.").exists()
+
+
+@pytest.mark.django_db
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+def test_status_change_sends_email_notification(client: Client):
+    area = service_area("Central", "City", "email-city")
+    staff = User.objects.create_user(email="staff@example.com", password="pass", is_staff=True)
+    issue = Issue.objects.create(reference="CF-20260730-EMAIL", tenant=area.tenant, service_area=area, category=Issue.Category.POTHOLE, description="Pothole", location=Point(.5, .5, srid=4326), contact_email="citizen@example.com", contact_preference=Issue.ContactPreference.EMAIL, tracking_token_hash="x")
+    client.force_login(staff)
+    client.post(reverse("issues:report_detail", kwargs={"pk": issue.pk}), {"status": Issue.Status.CLOSED, "public_message": "The repair is complete."})
+    assert len(mail.outbox) == 1
+    assert issue.reference in mail.outbox[0].subject
+
+
+@pytest.mark.django_db
+def test_tracking_lookup_is_rate_limited(client: Client):
+    cache.clear()
+    for _ in range(10):
+        client.post(reverse("issues:track-lookup"), {"reference": "CF-NOT-FOUND", "verification_code": "bad"})
+    response = client.post(reverse("issues:track-lookup"), {"reference": "CF-NOT-FOUND", "verification_code": "bad"})
+    assert response.status_code == 200
+    assert b"Too many verification attempts" in response.content
