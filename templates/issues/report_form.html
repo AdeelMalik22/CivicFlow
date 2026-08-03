@@ -25,6 +25,7 @@
 {% block extra_scripts %}
 {{ form.media.js }}
 {{ service_area_bounds|json_script:"service-area-bounds" }}
+{{ service_area_geojson|json_script:"service-area-geojson" }}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 (function () {
@@ -36,15 +37,20 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
     let pin;
     const boundsData = JSON.parse(document.getElementById('service-area-bounds').textContent || '{}');
+    const geometryData = JSON.parse(document.getElementById('service-area-geojson').textContent || '{}');
     const areaSelect = document.getElementById('id_service_area');
+    let boundaryLayer;
     function selectedBounds() { const b = boundsData[areaSelect && areaSelect.value]; return b ? L.latLngBounds([b[1], b[0]], [b[3], b[2]]) : null; }
+    function pointInRing(point, ring) { let inside = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const xi=ring[i][0], yi=ring[i][1], xj=ring[j][0], yj=ring[j][1]; const intersect=((yi>point.lat)!==(yj>point.lat)) && (point.lng < (xj-xi)*(point.lat-yi)/(yj-yi)+xi); if (intersect) inside=!inside; } return inside; }
+    function pointInGeometry(point, geometry) { if (!geometry) return true; const polygons = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates; return polygons.some(poly => pointInRing([point.lng, point.lat], poly[0]) && !poly.slice(1).some(hole => pointInRing([point.lng, point.lat], hole))); }
+    function drawArea() { if (boundaryLayer) map.removeLayer(boundaryLayer); const raw=geometryData[areaSelect && areaSelect.value]; if (!raw) return; const geo=JSON.parse(raw); boundaryLayer=L.geoJSON(geo,{style:{color:'#5148df',weight:3,fillColor:'#7167e8',fillOpacity:.16,interactive:false}}).addTo(map); map.fitBounds(boundaryLayer.getBounds(),{padding:[18,18]}); }
     function place(lat, lon) {
-      const allowed = selectedBounds();
-      if (allowed && !allowed.contains([lat, lon])) { alert('Please place the pin inside the selected service area.'); return; }
+      const raw=geometryData[areaSelect && areaSelect.value];
+      if (raw && !pointInGeometry({lat, lng:lon}, JSON.parse(raw))) { alert('Please place the pin inside the selected service area.'); return; }
       if (pin) pin.setLatLng([lat, lon]); else pin = L.marker([lat, lon]).addTo(map);
       field.value = `POINT (${lon.toFixed(6)} ${lat.toFixed(6)})`;
     }
-    function fitArea() { const allowed = selectedBounds(); if (allowed) map.fitBounds(allowed, { padding: [18, 18] }); }
+    function fitArea() { drawArea(); const allowed = selectedBounds(); if (allowed && !boundaryLayer) map.fitBounds(allowed, { padding: [18, 18] }); }
     if (areaSelect) areaSelect.addEventListener('change', fitArea);
     if (areaSelect && areaSelect.value) setTimeout(fitArea, 120);
     map.on('click', e => place(e.latlng.lat, e.latlng.lng));

@@ -28,6 +28,9 @@ class IssueReportView(FormView):
         context["service_area_bounds"] = {
             str(area.pk): list(area.boundary.extent) for area in areas if area.boundary
         }
+        context["service_area_geojson"] = {
+            str(area.pk): area.boundary.geojson for area in areas if area.boundary
+        }
         context.update(
             {
                 "eyebrow": "Citizen reporting",
