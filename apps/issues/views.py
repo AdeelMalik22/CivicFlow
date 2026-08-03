@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
@@ -158,10 +158,14 @@ class MyIssueListView(LoginRequiredMixin, ListView):
         return context
 
 
-class IssueOperationsListView(LoginRequiredMixin, ListView):
+class IssueOperationsListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = "issues/reports.html"
     context_object_name = "issues"
     paginate_by = 10
+
+    def test_func(self):
+        return self.request.user.is_staff
+
     def get_queryset(self):
         queryset = Issue.objects.select_related("service_area", "tenant").order_by("-created_at")
         tenant = getattr(self.request, "tenant", None)
@@ -186,10 +190,13 @@ class IssueOperationsListView(LoginRequiredMixin, ListView):
         return context
 
 
-class IssueOperationsDetailView(LoginRequiredMixin, DetailView):
+class IssueOperationsDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     template_name = "issues/report_detail.html"
     context_object_name = "issue"
     model = Issue
+
+    def test_func(self):
+        return self.request.user.is_staff
 
     def get_queryset(self):
         queryset = Issue.objects.select_related("service_area", "tenant", "reporter", "assigned_to", "assigned_department").prefetch_related(
