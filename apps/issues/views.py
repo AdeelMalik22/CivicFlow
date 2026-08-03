@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -63,6 +64,23 @@ class IssueSubmittedView(TemplateView):
 class PublicTrackingLookupView(FormView):
     template_name = "issues/track_lookup.html"
     form_class = PublicTrackingForm
+
+    def post(self, request, *args, **kwargs):
+        ip = request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip() or request.META.get("REMOTE_ADDR", "unknown")
+        key = f"civicflow:tracking-attempts:{ip}"
+        attempts = cache.get(key, 0)
+        if attempts >= 10:
+            form = self.get_form()
+            form.add_error(None, "Too many verification attempts. Please try again in 15 minutes.")
+            return self.form_invalid(form)
+        if attempts == 0:
+            cache.add(key, 1, timeout=900)
+        else:
+            try:
+                cache.incr(key)
+            except ValueError:
+                cache.set(key, 1, timeout=900)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         issue = Issue.objects.filter(reference=form.cleaned_data["reference"]).first()
