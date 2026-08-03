@@ -3,10 +3,10 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import DetailView, FormView, ListView, TemplateView
-from apps.tenants.models import ServiceArea
+from apps.tenants.models import Department, ServiceArea
 
 from .forms import IssueReportForm, PublicTrackingForm, StaffIssueUpdateForm
-from .models import Issue, IssueStatusEvent
+from .models import Issue, IssueInternalNote, IssueStatusEvent
 from .services import submit_issue
 
 
@@ -169,8 +169,8 @@ class IssueOperationsDetailView(LoginRequiredMixin, DetailView):
     model = Issue
 
     def get_queryset(self):
-        queryset = Issue.objects.select_related("service_area", "tenant", "reporter").prefetch_related(
-            "status_events", "attachments"
+        queryset = Issue.objects.select_related("service_area", "tenant", "reporter", "assigned_to", "assigned_department").prefetch_related(
+            "status_events", "attachments", "internal_notes__author"
         )
         tenant = getattr(self.request, "tenant", None)
         return queryset.filter(tenant=tenant) if tenant else queryset.none()
@@ -179,22 +179,29 @@ class IssueOperationsDetailView(LoginRequiredMixin, DetailView):
         from django.contrib.auth import get_user_model
         return get_user_model().objects.filter(is_active=True, is_staff=True).order_by("email")
 
+    def get_department_queryset(self):
+        return Department.objects.filter(tenant=self.object.tenant, is_active=True).order_by("name")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["update_form"] = StaffIssueUpdateForm(
-            initial={"status": self.object.status, "assigned_to": self.object.assigned_to_id},
+            initial={"status": self.object.status, "assigned_to": self.object.assigned_to_id, "assigned_department": self.object.assigned_department_id},
             staff_queryset=self.get_staff_queryset(),
+            department_queryset=self.get_department_queryset(),
         )
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = StaffIssueUpdateForm(request.POST, staff_queryset=self.get_staff_queryset())
+        form = StaffIssueUpdateForm(request.POST, staff_queryset=self.get_staff_queryset(), department_queryset=self.get_department_queryset())
         if form.is_valid():
             old_status = self.object.status
             self.object.status = form.cleaned_data["status"]
             self.object.assigned_to = form.cleaned_data["assigned_to"]
-            self.object.save(update_fields=["status", "assigned_to", "updated_at"])
+            self.object.assigned_department = form.cleaned_data["assigned_department"]
+            self.object.save(update_fields=["status", "assigned_to", "assigned_department", "updated_at"])
+            if note := form.cleaned_data["internal_note"].strip():
+                IssueInternalNote.objects.create(issue=self.object, author=request.user, body=note)
             message = form.cleaned_data["public_message"].strip()
             if message or old_status != self.object.status:
                 IssueStatusEvent.objects.create(

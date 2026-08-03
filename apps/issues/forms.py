@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 import re
 
 from apps.tenants.models import ServiceArea
+from apps.tenants.models import Department
 
 from .models import Issue
 
@@ -121,11 +122,14 @@ class IssueReportForm(forms.ModelForm):
 class StaffIssueUpdateForm(forms.Form):
     status = forms.ChoiceField(choices=Issue.Status.choices)
     assigned_to = forms.ModelChoiceField(queryset=None, required=False, empty_label="Unassigned")
+    assigned_department = forms.ModelChoiceField(queryset=None, required=False, empty_label="No department")
     public_message = forms.CharField(required=False, max_length=500, widget=forms.Textarea(attrs={"rows": 3}))
+    internal_note = forms.CharField(required=False, max_length=2000, widget=forms.Textarea(attrs={"rows": 3}))
 
-    def __init__(self, *args, staff_queryset=None, **kwargs):
+    def __init__(self, *args, staff_queryset=None, department_queryset=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["assigned_to"].queryset = staff_queryset if staff_queryset is not None else self.fields["assigned_to"].queryset.none()
+        self.fields["assigned_department"].queryset = department_queryset if department_queryset is not None else Department.objects.none()
 
 
 class PublicTrackingForm(forms.Form):

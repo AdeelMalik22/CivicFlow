@@ -9,7 +9,7 @@ from django.core.validators import validate_email
 from django.db import models
 from django.utils import timezone
 
-from apps.tenants.models import ServiceArea, Tenant
+from apps.tenants.models import Department, ServiceArea, Tenant
 
 
 class Issue(models.Model):
@@ -50,6 +50,13 @@ class Issue(models.Model):
     )
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="assigned_issues",
+    )
+    assigned_department = models.ForeignKey(
+        Department,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -124,6 +131,16 @@ class IssueStatusEvent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.issue.reference}: {self.get_status_display()}"
+
+
+class IssueInternalNote(models.Model):
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name="internal_notes")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="issue_internal_notes")
+    body = models.TextField(max_length=2000)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ("-created_at",)
 
 
 def create_tracking_token() -> str:
