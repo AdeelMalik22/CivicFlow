@@ -10,14 +10,13 @@ from .models import Issue
 from .services import submit_issue
 
 
-class IssueReportView(LoginRequiredMixin, FormView):
+class IssueReportView(FormView):
     template_name = "issues/report_form.html"
     form_class = IssueReportForm
-    login_url = "login"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
+        kwargs["user"] = self.request.user if self.request.user.is_authenticated else None
         return kwargs
 
     def get_context_data(self, **kwargs):
