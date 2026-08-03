@@ -9,7 +9,7 @@ from django.views.generic import DetailView, FormView, ListView, TemplateView
 from apps.tenants.models import Department, ServiceArea
 
 from .forms import IssueReportForm, PublicTrackingForm, StaffIssueUpdateForm
-from .models import Issue, IssueInternalNote, IssueStatusEvent
+from .models import Issue, IssueAssignmentAudit, IssueInternalNote, IssueStatusEvent
 from .services import submit_issue
 
 
@@ -226,10 +226,18 @@ class IssueOperationsDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailV
         form = StaffIssueUpdateForm(request.POST, staff_queryset=self.get_staff_queryset(), department_queryset=self.get_department_queryset())
         if form.is_valid():
             old_status = self.object.status
+            old_staff = self.object.assigned_to_id
+            old_department = self.object.assigned_department_id
             self.object.status = form.cleaned_data["status"]
             self.object.assigned_to = form.cleaned_data["assigned_to"]
             self.object.assigned_department = form.cleaned_data["assigned_department"]
             self.object.save(update_fields=["status", "assigned_to", "assigned_department", "updated_at"])
+            if old_staff != self.object.assigned_to_id or old_department != self.object.assigned_department_id:
+                IssueAssignmentAudit.objects.create(
+                    issue=self.object, actor=request.user,
+                    previous_staff_id=old_staff, new_staff_id=self.object.assigned_to_id,
+                    previous_department_id=old_department, new_department_id=self.object.assigned_department_id,
+                )
             if note := form.cleaned_data["internal_note"].strip():
                 IssueInternalNote.objects.create(issue=self.object, author=request.user, body=note)
             message = form.cleaned_data["public_message"].strip()

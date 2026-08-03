@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
 
-from .models import Issue, IssueAttachment, IssueInternalNote, IssueStatusEvent
+from .models import Issue, IssueAssignmentAudit, IssueAttachment, IssueInternalNote, IssueStatusEvent
 
 
 class IssueStatusEventInline(admin.TabularInline):
@@ -41,6 +41,14 @@ class IssueInternalNoteAdmin(admin.ModelAdmin):
     search_fields = ("issue__reference", "body", "author__email")
     readonly_fields = ("created_at",)
     autocomplete_fields = ("issue", "author")
+
+
+@admin.register(IssueAssignmentAudit)
+class IssueAssignmentAuditAdmin(admin.ModelAdmin):
+    list_display = ("issue", "actor", "previous_staff_id", "new_staff_id", "created_at")
+    list_filter = ("created_at",)
+    search_fields = ("issue__reference", "actor__email")
+    readonly_fields = ("issue", "actor", "previous_staff_id", "new_staff_id", "previous_department_id", "new_department_id", "created_at")
 
 
 @admin.register(IssueAttachment)

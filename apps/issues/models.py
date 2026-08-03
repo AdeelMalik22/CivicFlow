@@ -143,6 +143,19 @@ class IssueInternalNote(models.Model):
         ordering = ("-created_at",)
 
 
+class IssueAssignmentAudit(models.Model):
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name="assignment_audits")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, related_name="issue_assignment_audits")
+    previous_staff_id = models.IntegerField(null=True, blank=True)
+    new_staff_id = models.IntegerField(null=True, blank=True)
+    previous_department_id = models.IntegerField(null=True, blank=True)
+    new_department_id = models.IntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+
 def create_tracking_token() -> str:
     return secrets.token_urlsafe(24)
 
