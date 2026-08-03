@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.conf import settings
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.core.mail import send_mail
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -122,7 +123,7 @@ class PublicIssueTrackingView(TemplateView):
             raise Http404
         context["issue"] = issue
         context["public_attachments"] = issue.attachments.filter(public_visible=True)
-        context["events"] = issue.status_events.all()
+        context["events_page"] = Paginator(issue.status_events.all(), 10).get_page(self.request.GET.get("events"))
         return context
 
 
@@ -220,6 +221,8 @@ class IssueOperationsDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailV
             staff_queryset=self.get_staff_queryset(),
             department_queryset=self.get_department_queryset(),
         )
+        context["events_page"] = Paginator(self.object.status_events.all(), 10).get_page(self.request.GET.get("events"))
+        context["notes_page"] = Paginator(self.object.internal_notes.all(), 10).get_page(self.request.GET.get("notes"))
         return context
 
     def post(self, request, *args, **kwargs):
