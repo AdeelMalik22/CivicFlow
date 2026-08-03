@@ -3,6 +3,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import FormView, ListView, TemplateView
+from apps.tenants.models import ServiceArea
 
 from .forms import IssueReportForm, PublicTrackingForm
 from .models import Issue
@@ -21,6 +22,10 @@ class IssueReportView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        areas = ServiceArea.objects.active()
+        context["service_area_bounds"] = {
+            str(area.pk): list(area.boundary.extent) for area in areas if area.boundary
+        }
         context.update(
             {
                 "eyebrow": "Citizen reporting",

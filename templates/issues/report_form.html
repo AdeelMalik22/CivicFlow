@@ -24,6 +24,7 @@
 {% endblock %}
 {% block extra_scripts %}
 {{ form.media.js }}
+{{ service_area_bounds|json_script:"service-area-bounds" }}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 (function () {
@@ -34,12 +35,23 @@
     const map = L.map(host, { zoomControl: true, dragging: true, scrollWheelZoom: true, touchZoom: true, doubleClickZoom: true, boxZoom: true, keyboard: true }).setView([24.8607, 67.0011], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
     let pin;
-    function place(lat, lon) { if (pin) pin.setLatLng([lat, lon]); else pin = L.marker([lat, lon]).addTo(map); field.value = `POINT (${lon.toFixed(6)} ${lat.toFixed(6)})`; }
+    const boundsData = JSON.parse(document.getElementById('service-area-bounds').textContent || '{}');
+    const areaSelect = document.getElementById('id_service_area');
+    function selectedBounds() { const b = boundsData[areaSelect && areaSelect.value]; return b ? L.latLngBounds([b[1], b[0]], [b[3], b[2]]) : null; }
+    function place(lat, lon) {
+      const allowed = selectedBounds();
+      if (allowed && !allowed.contains([lat, lon])) { alert('Please place the pin inside the selected service area.'); return; }
+      if (pin) pin.setLatLng([lat, lon]); else pin = L.marker([lat, lon]).addTo(map);
+      field.value = `POINT (${lon.toFixed(6)} ${lat.toFixed(6)})`;
+    }
+    function fitArea() { const allowed = selectedBounds(); if (allowed) map.fitBounds(allowed, { padding: [18, 18] }); }
+    if (areaSelect) areaSelect.addEventListener('change', fitArea);
+    if (areaSelect && areaSelect.value) setTimeout(fitArea, 120);
     map.on('click', e => place(e.latlng.lat, e.latlng.lng));
     map.on('locationfound', e => { map.setView(e.latlng, 16); place(e.latlng.lat, e.latlng.lng); });
     map.on('locationerror', e => { host.setAttribute('data-location-error', e.message || 'Location permission was not granted.'); });
     const locate = L.control({position:'topleft'}); locate.onAdd = function () { const b = L.DomUtil.create('button','leaflet-bar leaflet-control-locate'); b.type='button'; b.title='Use my location'; b.textContent='◎'; L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b,'click',()=>navigator.geolocation && navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude,p.coords.longitude],16); place(p.coords.latitude,p.coords.longitude);})); return b; }; locate.addTo(map);
-    map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true, watch: false });
+    if (!areaSelect || !areaSelect.value) map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true, watch: false });
     setTimeout(() => map.invalidateSize(), 100);
   }
   setTimeout(init, 100);
