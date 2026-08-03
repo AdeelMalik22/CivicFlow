@@ -22,7 +22,7 @@ class IssueAdmin(GISModelAdmin):
     list_filter = ("status", "category", "tenant", "service_area")
     search_fields = ("reference", "description", "reporter__email")
     readonly_fields = ("public_id", "reference", "created_at", "updated_at", "tracking_token_hash")
-    autocomplete_fields = ("tenant", "service_area", "reporter")
+    autocomplete_fields = ("tenant", "service_area", "reporter", "assigned_to")
     inlines = (IssueStatusEventInline, IssueAttachmentInline)
 
 

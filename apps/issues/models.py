@@ -48,6 +48,13 @@ class Issue(models.Model):
         on_delete=models.SET_NULL,
         related_name="reported_issues",
     )
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="assigned_issues",
+    )
     category = models.CharField(max_length=32, choices=Category)
     description = models.TextField(max_length=4000)
     location = gis_models.PointField(srid=4326)

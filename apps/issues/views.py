@@ -5,8 +5,8 @@ from django.urls import reverse
 from django.views.generic import DetailView, FormView, ListView, TemplateView
 from apps.tenants.models import ServiceArea
 
-from .forms import IssueReportForm, PublicTrackingForm
-from .models import Issue
+from .forms import IssueReportForm, PublicTrackingForm, StaffIssueUpdateForm
+from .models import Issue, IssueStatusEvent
 from .services import submit_issue
 
 
@@ -174,3 +174,33 @@ class IssueOperationsDetailView(LoginRequiredMixin, DetailView):
         )
         tenant = getattr(self.request, "tenant", None)
         return queryset.filter(tenant=tenant) if tenant else queryset.none()
+
+    def get_staff_queryset(self):
+        from django.contrib.auth import get_user_model
+        return get_user_model().objects.filter(is_active=True, is_staff=True).order_by("email")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["update_form"] = StaffIssueUpdateForm(
+            initial={"status": self.object.status, "assigned_to": self.object.assigned_to_id},
+            staff_queryset=self.get_staff_queryset(),
+        )
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = StaffIssueUpdateForm(request.POST, staff_queryset=self.get_staff_queryset())
+        if form.is_valid():
+            old_status = self.object.status
+            self.object.status = form.cleaned_data["status"]
+            self.object.assigned_to = form.cleaned_data["assigned_to"]
+            self.object.save(update_fields=["status", "assigned_to", "updated_at"])
+            message = form.cleaned_data["public_message"].strip()
+            if message or old_status != self.object.status:
+                IssueStatusEvent.objects.create(
+                    issue=self.object, status=self.object.status,
+                    public_message=message or f"Report status updated to {self.object.get_status_display()}.",
+                    actor=request.user,
+                )
+            return redirect("issues:report_detail", pk=self.object.pk)
+        return self.render_to_response(self.get_context_data(update_form=form))

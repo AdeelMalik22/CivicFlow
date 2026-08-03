@@ -118,6 +118,16 @@ class IssueReportForm(forms.ModelForm):
         return cleaned_data
 
 
+class StaffIssueUpdateForm(forms.Form):
+    status = forms.ChoiceField(choices=Issue.Status.choices)
+    assigned_to = forms.ModelChoiceField(queryset=None, required=False, empty_label="Unassigned")
+    public_message = forms.CharField(required=False, max_length=500, widget=forms.Textarea(attrs={"rows": 3}))
+
+    def __init__(self, *args, staff_queryset=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["assigned_to"].queryset = staff_queryset if staff_queryset is not None else self.fields["assigned_to"].queryset.none()
+
+
 class PublicTrackingForm(forms.Form):
     reference = forms.CharField(
         max_length=24,
