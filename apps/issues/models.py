@@ -173,6 +173,7 @@ class IssueAttachment(models.Model):
         on_delete=models.SET_NULL,
         related_name="issue_attachments",
     )
+    public_visible = models.BooleanField(default=True, help_text="When disabled, this photo is visible to staff only.")
 
     class Meta:
         ordering = ("uploaded_at",)

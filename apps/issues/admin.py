@@ -53,7 +53,8 @@ class IssueAssignmentAuditAdmin(admin.ModelAdmin):
 
 @admin.register(IssueAttachment)
 class IssueAttachmentAdmin(admin.ModelAdmin):
-    list_display = ("issue", "original_name", "uploaded_by", "uploaded_at")
+    list_display = ("issue", "original_name", "public_visible", "uploaded_by", "uploaded_at")
+    list_filter = ("public_visible", "uploaded_at")
     search_fields = ("issue__reference", "original_name", "checksum")
     readonly_fields = ("original_name", "checksum", "uploaded_at")
     autocomplete_fields = ("issue", "uploaded_by")

@@ -121,6 +121,7 @@ class PublicIssueTrackingView(TemplateView):
         if issue is None or (not owns_issue and not issue.check_tracking_token(kwargs["token"])):
             raise Http404
         context["issue"] = issue
+        context["public_attachments"] = issue.attachments.filter(public_visible=True)
         context["events"] = issue.status_events.all()
         return context
 
