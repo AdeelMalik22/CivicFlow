@@ -2,13 +2,13 @@ import secrets
 from hashlib import sha256
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
 from django.urls import reverse
 from django.utils import timezone
 
 from .forms import IssueReportForm
 from .models import Issue, IssueAttachment, IssueStatusEvent, create_tracking_token
+from .tasks import send_issue_received_email
 
 
 def _reference() -> str:
@@ -60,14 +60,6 @@ def submit_issue(form: IssueReportForm, *, request) -> tuple[Issue, str]:
             reverse("issues:track", kwargs={"reference": issue.reference, "token": token})
         )
         transaction.on_commit(
-            lambda: send_mail(
-                subject=f"CivicFlow report received: {issue.reference}",
-                message=(
-                    f"We received your infrastructure report ({issue.reference}).\n\n"
-                    f"Track progress securely: {tracking_url}"
-                ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[issue.contact_email],
-            )
+            lambda: send_issue_received_email.delay(issue.contact_email, issue.reference, tracking_url)
         )
     return issue, token
